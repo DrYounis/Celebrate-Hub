@@ -22,8 +22,38 @@
 
 .subtitle {
     font-size: 1.1rem;
-    margin-bottom: 3rem;
+    margin-bottom: 2rem;
     opacity: 0.9;
+}
+
+.filterContainer {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-bottom: 2rem;
+}
+
+.filterButton {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #fff;
+    padding: 0.5rem 1.5rem;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: var(--font-main);
+    font-size: 1rem;
+}
+
+.filterButton:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.active {
+    background: var(--secondary);
+    color: #1a0536;
+    border-color: var(--secondary);
+    font-weight: 700;
 }
 
 .gameBox {
