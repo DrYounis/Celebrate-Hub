@@ -1,3 +1,4 @@
+"use client";
 import React, { useState } from 'react';
 import { Calculator, CheckCircle2 } from 'lucide-react';
 import { Button } from './ui/Button';
