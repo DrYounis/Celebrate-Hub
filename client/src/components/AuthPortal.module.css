@@ -208,12 +208,17 @@
 /* Mobile Responsiveness */
 @media (max-width: 768px) {
     .container {
-        padding: 1.5rem;
+        padding: 1.5rem 1rem;
+        /* Reduce padding */
         max-width: 100%;
+        box-shadow: none;
+        /* Simplify on mobile */
     }
 
     .title {
-        font-size: 1.5rem;
+        font-size: 1.25rem;
+        /* Smaller title */
+        margin-bottom: 1.5rem;
     }
 
     .input {

@@ -35,7 +35,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                     backgroundColor: 'transparent',
                     position: 'relative',
                     maxWidth: '450px',
-                    width: '100%',
+                    width: '90%', // Better on mobile
+                    maxHeight: '90vh',
+                    overflowY: 'auto',
+                    borderRadius: '24px', // Match Portal border radius
                 }}
                 onClick={(e) => e.stopPropagation()}
             >
