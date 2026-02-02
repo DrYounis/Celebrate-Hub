@@ -6,10 +6,12 @@ import { Search, PartyPopper } from 'lucide-react';
 import { Button } from './ui/Button';
 import styles from './Header.module.css';
 import { AuthModal } from './AuthModal';
+import { SmartConcierge } from './SmartConcierge';
 import { supabase } from '@/lib/supabaseClient';
 
 export const Header = () => {
     const [isAuthOpen, setIsAuthOpen] = React.useState(false);
+    const [isConciergeOpen, setIsConciergeOpen] = React.useState(false);
     const [user, setUser] = React.useState<any>(null);
 
     React.useEffect(() => {
@@ -60,10 +62,16 @@ export const Header = () => {
                 ) : (
                     <Button variant="ghost" onClick={() => setIsAuthOpen(true)}>تسجيل الدخول</Button>
                 )}
-                <Button variant="primary">أضف مناسبتك</Button>
+                <button
+                    className={styles.addEventButton}
+                    onClick={() => setIsConciergeOpen(true)}
+                >
+                    أضف مناسبتك
+                </button>
             </div>
 
             <AuthModal isOpen={isAuthOpen} onClose={() => setIsAuthOpen(false)} />
+            <SmartConcierge isOpen={isConciergeOpen} onClose={() => setIsConciergeOpen(false)} />
         </header>
     );
 };

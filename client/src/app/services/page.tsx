@@ -106,18 +106,18 @@ export default function ServicesPage() {
 
                     {/* Search Bar */}
                     <div className="max-w-3xl mx-auto bg-white rounded-2xl p-2 shadow-2xl">
-                        <div className="flex items-center gap-2">
-                            <Search className="text-gray-400 mr-3" size={24} />
+                        <div className="flex items-center gap-2 flex-row-reverse"> {/* Ensure proper order in RTL */}
+                            <button className="bg-purple-600 text-white px-8 py-3 rounded-xl hover:bg-purple-700 transition font-bold whitespace-nowrap">
+                                بحث
+                            </button>
                             <input
                                 type="text"
                                 placeholder="ابحث عن قاعة، مصور، أو أي خدمة..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="flex-1 p-3 text-gray-900 outline-none text-lg"
+                                className="flex-1 p-3 text-gray-900 outline-none text-lg text-right"
                             />
-                            <button className="bg-purple-600 text-white px-8 py-3 rounded-xl hover:bg-purple-700 transition font-bold">
-                                بحث
-                            </button>
+                            <Search className="text-gray-400 ml-3" size={24} />
                         </div>
                     </div>
                 </div>
@@ -134,8 +134,8 @@ export default function ServicesPage() {
                         <button
                             onClick={() => setSelectedCategory('all')}
                             className={`px-6 py-2 rounded-full font-bold transition ${selectedCategory === 'all'
-                                    ? 'bg-purple-600 text-white shadow-lg'
-                                    : 'bg-white text-gray-700 border border-gray-300 hover:border-purple-600'
+                                ? 'bg-purple-600 text-white shadow-lg'
+                                : 'bg-white text-gray-700 border border-gray-300 hover:border-purple-600'
                                 }`}
                         >
                             الكل ({services.length})
@@ -148,8 +148,8 @@ export default function ServicesPage() {
                                     key={key}
                                     onClick={() => setSelectedCategory(key)}
                                     className={`px-6 py-2 rounded-full font-bold transition ${selectedCategory === key
-                                            ? 'bg-purple-600 text-white shadow-lg'
-                                            : 'bg-white text-gray-700 border border-gray-300 hover:border-purple-600'
+                                        ? 'bg-purple-600 text-white shadow-lg'
+                                        : 'bg-white text-gray-700 border border-gray-300 hover:border-purple-600'
                                         }`}
                                 >
                                     {label} ({count})
