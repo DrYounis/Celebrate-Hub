@@ -7,3 +7,8 @@ build
 dist
 .vscode
 .idea
+
+# macOS metadata files
+._*
+.AppleDouble
+.LSOverride
