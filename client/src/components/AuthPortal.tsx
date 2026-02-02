@@ -59,23 +59,6 @@ export const AuthPortal: React.FC<AuthPortalProps> = ({ onSuccess }) => {
         }
     };
 
-    const handleSocialLogin = async (provider: 'google' | 'apple') => {
-        setLoading(true);
-        setError(null);
-        try {
-            const { error: socialError } = await supabase.auth.signInWithOAuth({
-                provider,
-                options: {
-                    redirectTo: `${window.location.origin}/dashboard`,
-                }
-            });
-            if (socialError) throw socialError;
-        } catch (err: any) {
-            setError(err.message || 'حدث خطأ في تسجيل الدخول الاجتماعي');
-            setLoading(false);
-        }
-    };
-
     return (
         <div className={styles.container}>
             <h2 className={styles.title}>
@@ -145,32 +128,6 @@ export const AuthPortal: React.FC<AuthPortalProps> = ({ onSuccess }) => {
                     {loading ? 'جاري التحميل...' : (isLogin ? 'دخول' : 'إنشاء حساب جديد')}
                 </button>
             </form>
-
-            <div className={styles.divider}>
-                <span className={styles.dividerText}>أو استمر عبر</span>
-            </div>
-
-            <div className={styles.socialGrid}>
-                <button
-                    onClick={() => handleSocialLogin('google')}
-                    className={styles.socialButton}
-                    type="button"
-                    disabled={loading}
-                >
-                    <img src="https://www.svgrepo.com/show/355037/google.svg" className={styles.socialIcon} alt="Google" />
-                    <span className={styles.socialText}>Google</span>
-                </button>
-
-                <button
-                    onClick={() => handleSocialLogin('apple')}
-                    className={styles.socialButton}
-                    type="button"
-                    disabled={loading}
-                >
-                    <img src="https://www.svgrepo.com/show/442930/apple.svg" className={styles.socialIcon} alt="Apple" />
-                    <span className={styles.socialText}>Apple</span>
-                </button>
-            </div>
 
             <div className={styles.toggleLink}>
                 {isLogin ? 'ليس لديك حساب؟' : 'لديك حساب بالفعل؟'}
