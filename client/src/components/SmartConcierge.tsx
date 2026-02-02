@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import { X, ChevronLeft, ChevronRight, Gift, Calendar, MapPin, DollarSign, Package, Check } from 'lucide-react';
 import { supabase } from '@/lib/supabaseClient';
 
 interface SmartConciergeProps {
@@ -9,39 +8,19 @@ interface SmartConciergeProps {
     onClose: () => void;
 }
 
-type Step = 'type' | 'location' | 'budget' | 'services' | 'contact';
-
 export const SmartConcierge: React.FC<SmartConciergeProps> = ({ isOpen, onClose }) => {
-    const [step, setStep] = useState<number>(1);
+    const [step, setStep] = useState(1);
     const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({
-        eventType: '',
-        city: '',
-        date: '',
+        type: '',
+        city: 'حائل',
         budget: '',
-        services: [] as string[],
-        name: '',
         phone: '',
         email: ''
     });
 
-    if (!isOpen) return null;
-
-    const nextStep = () => setStep(prev => prev + 1);
-    const prevStep = () => setStep(prev => prev - 1);
-
-    const handleSelect = (field: string, value: any) => {
-        setFormData(prev => ({ ...prev, [field]: value }));
-    };
-
-    const toggleService = (service: string) => {
-        setFormData(prev => {
-            const services = prev.services.includes(service)
-                ? prev.services.filter(s => s !== service)
-                : [...prev.services, service];
-            return { ...prev, services };
-        });
-    };
+    const nextStep = () => setStep(step + 1);
+    const prevStep = () => setStep(step - 1);
 
     const handleSubmit = async () => {
         setLoading(true);
@@ -50,19 +29,19 @@ export const SmartConcierge: React.FC<SmartConciergeProps> = ({ isOpen, onClose 
             const { error } = await supabase
                 .from('consultation_requests')
                 .insert([{
-                    event_type: formData.eventType,
+                    event_type: formData.type,
                     city: formData.city,
-                    event_date: formData.date,
                     budget_range: formData.budget,
-                    services_needed: formData.services,
-                    user_name: formData.name,
                     phone: formData.phone,
-                    email: formData.email
+                    email: formData.email,
+                    // Default values for schema compatibility
+                    services_needed: [],
+                    status: 'pending'
                 }]);
 
             if (error) throw error;
 
-            // 2. Award XP/Points (Mock for now or real if profile exists)
+            // 2. Award XP/Points
             const { data: { session } } = await supabase.auth.getSession();
             if (session?.user) {
                 await supabase.rpc('award_points', {
@@ -72,10 +51,7 @@ export const SmartConcierge: React.FC<SmartConciergeProps> = ({ isOpen, onClose 
                 });
             }
 
-            // 3. Success Feedback
-            alert('تم استلام طلبك بنجاح! سيتواصل معك فريقنا قريباً');
-            onClose();
-
+            nextStep(); // Go to success step (4)
         } catch (err) {
             console.error('Error submitting request:', err);
             alert('حدث خطأ بسيط، حاول مرة أخرى');
@@ -84,219 +60,127 @@ export const SmartConcierge: React.FC<SmartConciergeProps> = ({ isOpen, onClose 
         }
     };
 
-    // Render Steps
-    const renderStep = () => {
-        switch (step) {
-            case 1:
-                return (
-                    <div className="space-y-6 animate-fadeIn">
-                        <h3 className="text-2xl font-bold text-center text-purple-900">أهلاً بك! لنبدأ بتحديد نوع مناسبتك؟ 🎉</h3>
-                        <div className="grid grid-cols-2 gap-4">
-                            {['حفل زفاف 🏰', 'افتتاح مشروع 🎊', 'مناسبة خاصة 🎂', 'فعالية شركات 💼'].map((type) => (
-                                <button
-                                    key={type}
-                                    onClick={() => { handleSelect('eventType', type); nextStep(); }}
-                                    className={`p-4 rounded-xl border-2 transition-all hover:scale-105 ${formData.eventType === type
-                                        ? 'border-purple-600 bg-purple-50 text-purple-700'
-                                        : 'border-gray-200 hover:border-purple-300'
-                                        }`}
-                                >
-                                    <span className="text-lg font-medium">{type}</span>
-                                </button>
-                            ))}
-                        </div>
-                    </div>
-                );
+    if (!isOpen) return null;
 
-            case 2:
-                return (
-                    <div className="space-y-6 animate-fadeIn">
-                        <h3 className="text-2xl font-bold text-center text-purple-900">رائع! أين ومتى؟ 📍</h3>
-                        <div className="space-y-4">
-                            <div>
-                                <label className="block text-sm font-medium mb-2 text-gray-700">المدينة</label>
-                                <div className="flex gap-2">
-                                    {['حائل', 'الرياض', 'أخرى'].map(city => (
-                                        <button
-                                            key={city}
-                                            onClick={() => handleSelect('city', city)}
-                                            className={`flex-1 py-1 px-4 rounded-lg border ${formData.city === city ? 'bg-purple-600 text-white' : 'border-gray-300'
-                                                }`}
-                                        >
-                                            {city}
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
+    return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" dir="rtl">
+            <div className="bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-300 relative">
 
-                            <div>
-                                <label className="block text-sm font-medium mb-2 text-gray-700">التاريخ المتوقع</label>
-                                <input
-                                    type="date"
-                                    className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 outline-none text-right"
-                                    onChange={(e) => handleSelect('date', e.target.value)}
-                                    value={formData.date}
-                                />
-                            </div>
+                {/* Progress Bar */}
+                <div className="h-2 bg-gray-100 flex direction-ltr">
+                    <div
+                        className="bg-indigo-600 transition-all duration-500"
+                        style={{ width: `${(step / 4) * 100}%` }}
+                    ></div>
+                </div>
 
-                            <button
-                                onClick={nextStep}
-                                disabled={!formData.city || !formData.date}
-                                className="w-full bg-purple-600 text-white py-3 rounded-xl font-bold disabled:opacity-50 hover:bg-purple-700 transition"
-                            >
-                                التالي
-                            </button>
-                        </div>
-                    </div>
-                );
+                <div className="p-8 max-h-[90vh] overflow-y-auto">
+                    <button
+                        onClick={onClose}
+                        className="absolute top-4 left-4 text-gray-400 hover:text-gray-600 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition"
+                    >
+                        ✕
+                    </button>
 
-            case 3:
-                return (
-                    <div className="space-y-6 animate-fadeIn">
-                        <h3 className="text-2xl font-bold text-center text-purple-900">ما هي ميزانيتك التقديرية؟ 💰</h3>
-                        <div className="space-y-3">
-                            {[
-                                { label: 'باقة اقتصادية (أقل من 20 ألف)', value: 'economic' },
-                                { label: 'باقة متوسطة (20 - 50 ألف)', value: 'medium' },
-                                { label: 'باقة فاخرة (50 ألف +)', value: 'luxury' }
-                            ].map((opt) => (
-                                <button
-                                    key={opt.value}
-                                    onClick={() => { handleSelect('budget', opt.value); nextStep(); }}
-                                    className={`w-full p-4 rounded-xl border-2 text-right transition-all ${formData.budget === opt.value
-                                        ? 'border-purple-600 bg-purple-50'
-                                        : 'border-gray-200 hover:border-purple-300'
-                                        }`}
-                                >
-                                    <span className="font-bold text-gray-800">{opt.label}</span>
-                                </button>
-                            ))}
-                        </div>
-                    </div>
-                );
-
-            case 4:
-                return (
-                    <div className="space-y-6 animate-fadeIn">
-                        <h3 className="text-2xl font-bold text-center text-purple-900">ما الخدمات التي تحتاجها؟ ✨</h3>
-                        <div className="grid grid-cols-2 gap-3">
-                            {[
-                                { id: 'catering', label: 'الضيافة والعشاء 🍽️' },
-                                { id: 'decor', label: 'التنسيق والديكور 💐' },
-                                { id: 'transport', label: 'النقل واللوجستيك 🚗' },
-                                { id: 'photo', label: 'التصوير والتوثيق 📸' }
-                            ].map((srv) => (
-                                <button
-                                    key={srv.id}
-                                    onClick={() => toggleService(srv.id)}
-                                    className={`p-4 rounded-xl border-2 transition-all h-24 flex items-center justify-center text-center ${formData.services.includes(srv.id)
-                                        ? 'border-purple-600 bg-purple-50 text-purple-700'
-                                        : 'border-gray-200 hover:border-purple-300'
-                                        }`}
-                                >
-                                    <span className="font-bold">{srv.label}</span>
-                                </button>
-                            ))}
-                        </div>
-                        <button
-                            onClick={nextStep}
-                            disabled={formData.services.length === 0}
-                            className="w-full bg-purple-600 text-white py-3 rounded-xl font-bold disabled:opacity-50 hover:bg-purple-700 transition"
-                        >
-                            التالي
-                        </button>
-                    </div>
-                );
-
-            case 5:
-                return (
-                    <div className="space-y-6 animate-fadeIn">
-                        <div className="text-center mb-6">
-                            <h3 className="text-2xl font-bold text-purple-900 mb-2">خطوة أخيرة! 🚀</h3>
-                            <p className="text-gray-600">اترك بياناتك وسيتواصل معك خبير التخطيط لدينا</p>
-                        </div>
-
-                        <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-4 flex gap-3 text-right">
-                            <Gift className="text-amber-500 shrink-0" />
-                            <div>
-                                <p className="font-bold text-amber-800">هدية خاصة!</p>
-                                <p className="text-sm text-amber-700">سجل الآن واحصل على قسيمة خصم 10% صالحة لمدة 24 ساعة.</p>
+                    {step === 1 && (
+                        <div className="space-y-6">
+                            <h2 className="text-2xl font-bold text-gray-800 text-center">ما نوع مناسبتك؟ 🏰</h2>
+                            <div className="grid grid-cols-2 gap-4">
+                                {['حفل زفاف', 'افتتاح مشروع', 'مناسبة خاصة', 'فعالية شركات'].map(t => (
+                                    <button
+                                        key={t}
+                                        onClick={() => { setFormData({ ...formData, type: t }); nextStep(); }}
+                                        className="p-4 border-2 border-gray-100 rounded-2xl hover:border-indigo-600 hover:bg-indigo-50 transition-all text-sm font-bold text-gray-700 hover:text-indigo-700"
+                                    >
+                                        {t}
+                                    </button>
+                                ))}
                             </div>
                         </div>
+                    )}
 
-                        <div className="space-y-4">
-                            <input
-                                type="text"
-                                placeholder="الاسم الكريم"
-                                className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 outline-none text-right"
-                                value={formData.name}
-                                onChange={(e) => handleSelect('name', e.target.value)}
-                            />
+                    {step === 2 && (
+                        <div className="space-y-6">
+                            <h2 className="text-2xl font-bold text-gray-800 text-center">الميزانية والمدينة 📍</h2>
+
+                            <div className="space-y-2">
+                                <label className="text-sm font-bold text-gray-600">المدينة</label>
+                                <select
+                                    className="w-full p-4 border-2 border-gray-100 rounded-2xl outline-none focus:border-indigo-600 bg-white"
+                                    value={formData.city}
+                                    onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                                >
+                                    <option value="حائل">حائل</option>
+                                    <option value="الرياض">الرياض</option>
+                                    <option value="القصيم">القصيم</option>
+                                </select>
+                            </div>
+
+                            <div className="space-y-3">
+                                <label className="text-sm font-bold text-gray-600">الميزانية التقديرية</label>
+                                {['باقة اقتصادية', 'باقة متوسطة', 'باقة فاخرة'].map(b => (
+                                    <button
+                                        key={b}
+                                        onClick={() => { setFormData({ ...formData, budget: b }); nextStep(); }}
+                                        className="w-full p-4 border-2 border-gray-100 rounded-2xl text-right hover:border-indigo-600 hover:bg-indigo-50 font-medium transition-all flex justify-between items-center group"
+                                    >
+                                        <span>{b}</span>
+                                        <span className="text-gray-300 group-hover:text-indigo-600">←</span>
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {step === 3 && (
+                        <div className="space-y-6">
+                            <h2 className="text-2xl font-bold text-gray-800 text-center">كيف نتواصل معك؟ 📞</h2>
+                            <p className="text-gray-500 text-sm text-center">سيقوم فريقنا بالاتصال بك لمراجعة التسعير والخدمات.</p>
+
                             <input
                                 type="tel"
-                                placeholder="رقم الجوال (05xxxxxxxx)"
-                                className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 outline-none text-right"
+                                placeholder="رقم الجوال (05xxxxxxx)"
+                                className="w-full p-4 border-2 border-gray-100 rounded-2xl text-right outline-none focus:border-indigo-600 transition-all"
                                 value={formData.phone}
-                                onChange={(e) => handleSelect('phone', e.target.value)}
+                                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                             />
+
                             <input
                                 type="email"
                                 placeholder="البريد الإلكتروني"
-                                className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 outline-none text-right"
+                                className="w-full p-4 border-2 border-gray-100 rounded-2xl text-right outline-none focus:border-indigo-600 transition-all"
                                 value={formData.email}
-                                onChange={(e) => handleSelect('email', e.target.value)}
+                                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                             />
+
+                            <button
+                                onClick={handleSubmit}
+                                disabled={!formData.phone || loading}
+                                className="w-full bg-indigo-600 text-white py-4 rounded-2xl font-bold shadow-lg shadow-indigo-200 hover:bg-indigo-700 transition transform hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                {loading ? 'جاري الإرسال...' : 'إرسال الطلب وحجز موعد الاتصال'}
+                            </button>
                         </div>
+                    )}
 
-                        <button
-                            onClick={handleSubmit}
-                            disabled={!formData.name || !formData.phone || loading}
-                            className="w-full bg-gradient-to-l from-purple-600 to-indigo-600 text-white py-4 rounded-xl font-bold text-lg hover:shadow-lg transition transform hover:-translate-y-1 disabled:opacity-50"
-                        >
-                            {loading ? 'جاري الإرسال...' : 'إرسال الطلب والحصول على الخصم ✨'}
-                        </button>
-                    </div>
-                );
-        }
-    };
-
-    return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" dir="rtl">
-            <div className="bg-white rounded-3xl w-full max-w-lg overflow-hidden shadow-2xl relative">
-                {/* Header */}
-                <div className="bg-purple-50 px-6 py-4 flex items-center justify-between border-b border-purple-100">
-                    <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-full bg-purple-600 flex items-center justify-center text-white font-bold">
-                            {step}/5
+                    {step === 4 && (
+                        <div className="text-center space-y-4 py-6">
+                            <div className="text-6xl animate-bounce">✅</div>
+                            <h2 className="text-2xl font-bold text-gray-800">تم استلام طلبك!</h2>
+                            <p className="text-gray-600 leading-relaxed">
+                                شكراً لك. فريق الاستشارات سيقوم بمراجعة طلبك والاتصال بك خلال ساعات العمل القادمة.
+                            </p>
+                            <div className="bg-purple-50 p-4 rounded-xl text-purple-700 font-bold border border-purple-100 animate-pulse">
+                                ربحت +50 XP لاهتمامك بالتفاصيل!
+                            </div>
+                            <button onClick={onClose} className="text-indigo-600 font-bold underline hover:text-indigo-800 mt-4">إغلاق</button>
                         </div>
-                        <span className="font-bold text-purple-900">المساعد الذكي</span>
-                    </div>
-                    <button onClick={onClose} className="p-2 hover:bg-purple-100 rounded-full transition">
-                        <X className="text-purple-700" size={20} />
-                    </button>
-                </div>
+                    )}
 
-                {/* Progress Bar */}
-                <div className="w-full bg-gray-100 h-1">
-                    <div
-                        className="bg-purple-600 h-1 transition-all duration-500 ease-out"
-                        style={{ width: `${(step / 5) * 100}%` }}
-                    />
+                    {step > 1 && step < 4 && (
+                        <button onClick={prevStep} className="mt-6 text-gray-400 text-sm hover:text-gray-600 transition">← العودة للخطوة السابقة</button>
+                    )}
                 </div>
-
-                {/* Content */}
-                <div className="p-6 min-h-[400px] flex flex-col justify-center">
-                    {renderStep()}
-                </div>
-
-                {/* Footer Navigation (if needed logic here) */}
-                {step > 1 && step < 5 && (
-                    <div className="px-6 pb-6 pt-0">
-                        <button onClick={prevStep} className="text-gray-400 hover:text-purple-600 text-sm font-medium flex items-center gap-1">
-                            <ChevronRight size={16} /> عودة للسابق
-                        </button>
-                    </div>
-                )}
             </div>
         </div>
     );
