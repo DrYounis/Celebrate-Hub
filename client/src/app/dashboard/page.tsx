@@ -87,9 +87,15 @@ const ClientDashboard = ({ profile }: { profile: any }) => {
                                         </p>
                                     </div>
                                     <div className="flex flex-col items-center gap-2">
+                                        <Link
+                                            href={`/chat/${req.id}`}
+                                            className="text-xs text-indigo-600 font-bold hover:underline mb-1"
+                                        >
+                                            💬 محادثة
+                                        </Link>
                                         <span className={`px-4 py-1.5 rounded-full text-xs font-bold ${req.status === 'completed' ? 'bg-green-100 text-green-700' :
-                                                req.status === 'accepted' ? 'bg-blue-100 text-blue-700' :
-                                                    req.status === 'rejected' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700'
+                                            req.status === 'accepted' ? 'bg-blue-100 text-blue-700' :
+                                                req.status === 'rejected' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700'
                                             }`}>
                                             {req.status === 'pending' ? '⏳ قيد المراجعة' :
                                                 req.status === 'accepted' ? '✅ مقبول' :
@@ -221,7 +227,16 @@ const ContractorDashboard = ({ profile }: { profile: any }) => {
                             </div>
                         </div>
 
-                        <div className="flex gap-2 w-full md:w-auto">
+                        <div className="flex gap-2 w-full md:w-auto items-center">
+                            {/* Chat Button */}
+                            <Link
+                                href={`/chat/${request.id}`}
+                                className="bg-indigo-50 text-indigo-600 p-3 rounded-lg hover:bg-indigo-100 transition"
+                                title="محادثة"
+                            >
+                                💬
+                            </Link>
+
                             {request.status === 'pending' ? (
                                 <>
                                     <button
