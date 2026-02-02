@@ -1,134 +1,248 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { supabase } from '@/lib/supabaseClient';
+import Link from 'next/link';
+import { Search, MapPin, Users, Star, Filter } from 'lucide-react';
 
-type Service = {
-    id: number;
-    name: string;
-    category: string;
-    price: string;
-    rating: number;
-    xpReward: number;
+interface Service {
+    id: string;
+    title: string;
     description: string;
-    features: string[];
+    category: string;
+    base_price: number;
+    location: string;
+    capacity: number;
+    average_rating: number;
+    total_reviews: number;
+    provider_id: string;
+    profiles: {
+        business_name: string;
+    };
+}
+
+const categoryLabels: Record<string, string> = {
+    venue: 'قاعات',
+    catering: 'تقديم طعام',
+    photography: 'تصوير',
+    decoration: 'ديكور',
+    entertainment: 'ترفيه',
+    planning: 'تنظيم',
+    other: 'أخرى',
 };
 
-const servicesData: Service[] = [
-    {
-        id: 1,
-        name: 'زلطه (Zalatah)',
-        category: 'الضيافة والعشاء',
-        price: '6,000 ر.س',
-        rating: 4.7,
-        xpReward: 15,
-        description: 'خيار معاصر لتقديم أطباق مبتكرة وضيافة خارجية فاخرة.',
-        features: ['بوفيه مفتوح', 'تقديم عصري', 'مناسب للتجمعات النوعية']
-    },
-    {
-        id: 2,
-        name: 'فلوري كادو',
-        category: 'التنسيق والديكور',
-        price: '4,000 ر.س',
-        rating: 4.8,
-        xpReward: 10,
-        description: 'متخصصون في تحويل المساحات بلمسات فنية وزهور طبيعية.',
-        features: ['تنسيق ورد طبيعي', 'تجهيز قاعات', 'تصميم ثيمات']
-    },
-    {
-        id: 3,
-        name: 'توصيل مشاوير بحائل',
-        category: 'النقل',
-        price: '2,000 ر.س',
-        rating: 4.0,
-        xpReward: 5,
-        description: 'خدمة نقل موثوقة للأفراد والمجموعات داخل وخارج مدينة حائل.',
-        features: ['خدمة 24 ساعة', 'سيارات حديثة', 'دقة في المواعيد']
-    }
-];
+export default function ServicesPage() {
+    const [services, setServices] = useState<Service[]>([]);
+    const [filteredServices, setFilteredServices] = useState<Service[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [selectedCategory, setSelectedCategory] = useState<string>('all');
+    const [searchQuery, setSearchQuery] = useState('');
 
-const ServicesPage = () => {
-    const [selectedServices, setSelectedServices] = useState<number[]>([]);
+    useEffect(() => {
+        fetchServices();
+    }, []);
 
-    const toggleService = (id: number) => {
-        if (selectedServices.includes(id)) {
-            setSelectedServices(selectedServices.filter(s => s !== id));
-        } else {
-            setSelectedServices([...selectedServices, id]);
+    useEffect(() => {
+        filterServices();
+    }, [selectedCategory, searchQuery, services]);
+
+    const fetchServices = async () => {
+        const { data, error } = await supabase
+            .from('services')
+            .select(`
+        *,
+        profiles:provider_id (business_name)
+      `)
+            .eq('is_active', true)
+            .order('average_rating', { ascending: false });
+
+        if (data) {
+            setServices(data as any);
+            setFilteredServices(data as any);
         }
+        setLoading(false);
     };
 
+    const filterServices = () => {
+        let filtered = services;
+
+        if (selectedCategory !== 'all') {
+            filtered = filtered.filter(s => s.category === selectedCategory);
+        }
+
+        if (searchQuery) {
+            filtered = filtered.filter(s =>
+                s.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                s.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                s.location?.toLowerCase().includes(searchQuery.toLowerCase())
+            );
+        }
+
+        setFilteredServices(filtered);
+    };
+
+    if (loading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                <div className="text-center">
+                    <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-purple-600 mx-auto mb-4"></div>
+                    <p className="text-gray-600">جاري تحميل الخدمات...</p>
+                </div>
+            </div>
+        );
+    }
+
     return (
-        <div className="min-h-screen bg-gray-50 py-24 px-4 sm:px-6 lg:px-8" dir="rtl">
-            <div className="max-w-7xl mx-auto">
-                {/* Header */}
-                <div className="text-center mb-12">
-                    <h1 className="text-4xl font-extrabold text-gray-900 mb-4">خدمات منصة Celebrate Hub</h1>
-                    <p className="text-xl text-gray-600">اختر خدماتك المفضلة لبناء فعاليتك المثالية في حائل</p>
-                    <div className="mt-4 inline-flex items-center bg-indigo-100 text-indigo-700 px-4 py-2 rounded-full font-bold">
-                        عدد الخدمات المختارة: {selectedServices.length}
+        <div className="min-h-screen bg-gradient-to-b from-purple-50 to-white" dir="rtl">
+            {/* Hero Section */}
+            <div className="bg-gradient-to-l from-purple-600 to-purple-800 text-white py-16 px-4">
+                <div className="max-w-7xl mx-auto">
+                    <h1 className="text-4xl md:text-5xl font-bold mb-4 text-center">
+                        اكتشف أفضل خدمات المناسبات
+                    </h1>
+                    <p className="text-xl text-purple-100 text-center mb-8">
+                        احجز الآن واحصل على نقاط مكافآت فورية!
+                    </p>
+
+                    {/* Search Bar */}
+                    <div className="max-w-3xl mx-auto bg-white rounded-2xl p-2 shadow-2xl">
+                        <div className="flex items-center gap-2">
+                            <Search className="text-gray-400 mr-3" size={24} />
+                            <input
+                                type="text"
+                                placeholder="ابحث عن قاعة، مصور، أو أي خدمة..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                className="flex-1 p-3 text-gray-900 outline-none text-lg"
+                            />
+                            <button className="bg-purple-600 text-white px-8 py-3 rounded-xl hover:bg-purple-700 transition font-bold">
+                                بحث
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div className="max-w-7xl mx-auto px-4 py-12">
+                {/* Category Filter */}
+                <div className="mb-8">
+                    <div className="flex items-center gap-2 mb-4">
+                        <Filter size={20} className="text-gray-600" />
+                        <h2 className="text-lg font-bold text-gray-900">تصفية حسب الفئة</h2>
+                    </div>
+                    <div className="flex flex-wrap gap-3">
+                        <button
+                            onClick={() => setSelectedCategory('all')}
+                            className={`px-6 py-2 rounded-full font-bold transition ${selectedCategory === 'all'
+                                    ? 'bg-purple-600 text-white shadow-lg'
+                                    : 'bg-white text-gray-700 border border-gray-300 hover:border-purple-600'
+                                }`}
+                        >
+                            الكل ({services.length})
+                        </button>
+                        {Object.entries(categoryLabels).map(([key, label]) => {
+                            const count = services.filter(s => s.category === key).length;
+                            if (count === 0) return null;
+                            return (
+                                <button
+                                    key={key}
+                                    onClick={() => setSelectedCategory(key)}
+                                    className={`px-6 py-2 rounded-full font-bold transition ${selectedCategory === key
+                                            ? 'bg-purple-600 text-white shadow-lg'
+                                            : 'bg-white text-gray-700 border border-gray-300 hover:border-purple-600'
+                                        }`}
+                                >
+                                    {label} ({count})
+                                </button>
+                            );
+                        })}
                     </div>
                 </div>
 
                 {/* Services Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {servicesData.map((service) => (
-                        <div
-                            key={service.id}
-                            className={`bg-white rounded-2xl shadow-lg overflow-hidden border-2 transition-all ${selectedServices.includes(service.id) ? 'border-indigo-500 ring-2 ring-indigo-200' : 'border-transparent'
-                                }`}
-                        >
-                            <div className="p-6 h-full flex flex-col">
-                                <div className="flex justify-between items-start mb-4">
-                                    <span className="bg-gray-100 text-gray-800 text-xs font-semibold px-2.5 py-0.5 rounded uppercase">
-                                        {service.category}
-                                    </span>
-                                    <span className="text-purple-600 font-bold text-sm">+{service.xpReward} XP</span>
+                {filteredServices.length === 0 ? (
+                    <div className="text-center py-16">
+                        <div className="text-6xl mb-4">🔍</div>
+                        <h3 className="text-2xl font-bold text-gray-900 mb-2">لا توجد خدمات متاحة</h3>
+                        <p className="text-gray-600">جرب تغيير معايير البحث أو الفئة</p>
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        {filteredServices.map((service) => (
+                            <Link
+                                key={service.id}
+                                href={`/services/${service.id}`}
+                                className="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100"
+                            >
+                                {/* Image Placeholder */}
+                                <div className="h-56 bg-gradient-to-br from-purple-400 to-pink-400 relative overflow-hidden">
+                                    <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition"></div>
+                                    <div className="absolute top-4 right-4 bg-white px-3 py-1 rounded-full text-sm font-bold text-purple-600">
+                                        {categoryLabels[service.category]}
+                                    </div>
+                                    {service.average_rating > 0 && (
+                                        <div className="absolute bottom-4 left-4 bg-white px-3 py-1 rounded-full flex items-center gap-1">
+                                            <Star size={16} className="text-yellow-500 fill-yellow-500" />
+                                            <span className="font-bold text-gray-900">{service.average_rating.toFixed(1)}</span>
+                                            <span className="text-gray-500 text-sm">({service.total_reviews})</span>
+                                        </div>
+                                    )}
                                 </div>
 
-                                <h3 className="text-xl font-bold text-gray-900 mb-2">{service.name}</h3>
-                                <p className="text-gray-500 text-sm mb-4">{service.description}</p>
+                                <div className="p-6">
+                                    <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-purple-600 transition">
+                                        {service.title}
+                                    </h3>
+                                    <p className="text-gray-600 text-sm mb-4 line-clamp-2">
+                                        {service.description || 'خدمة مميزة لمناسباتك الخاصة'}
+                                    </p>
 
-                                <div className="flex items-center mb-4">
-                                    <span className="text-yellow-400 text-lg">★</span>
-                                    <span className="mr-1 text-sm font-bold text-gray-700">{service.rating}</span>
+                                    <div className="space-y-2 mb-4">
+                                        <div className="flex items-center gap-2 text-gray-600 text-sm">
+                                            <MapPin size={16} className="text-purple-600" />
+                                            <span>{service.location}</span>
+                                        </div>
+                                        {service.capacity && (
+                                            <div className="flex items-center gap-2 text-gray-600 text-sm">
+                                                <Users size={16} className="text-purple-600" />
+                                                <span>يتسع لـ {service.capacity} ضيف</span>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+                                        <div>
+                                            <span className="text-sm text-gray-500">يبدأ من</span>
+                                            <p className="text-2xl font-bold text-purple-600">
+                                                {service.base_price.toLocaleString()} <span className="text-lg">ريال</span>
+                                            </p>
+                                        </div>
+                                        <button className="bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700 transition font-bold">
+                                            احجز الآن
+                                        </button>
+                                    </div>
                                 </div>
-
-                                <ul className="space-y-2 mb-6 flex-grow">
-                                    {service.features.map((feature, idx) => (
-                                        <li key={idx} className="flex items-center text-sm text-gray-600">
-                                            <span className="ml-2 text-indigo-500">✓</span> {feature}
-                                        </li>
-                                    ))}
-                                </ul>
-
-                                <div className="flex justify-between items-center border-t pt-4 mt-auto">
-                                    <span className="text-2xl font-bold text-indigo-600">{service.price}</span>
-                                    <button
-                                        onClick={() => toggleService(service.id)}
-                                        className={`px-6 py-2 rounded-lg font-bold transition ${selectedServices.includes(service.id)
-                                                ? 'bg-red-50 text-red-600 border border-red-200'
-                                                : 'bg-indigo-600 text-white hover:bg-indigo-700'
-                                            }`}
-                                    >
-                                        {selectedServices.includes(service.id) ? 'إلغاء' : 'إضافة'}
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-
-                {/* Footer Action */}
-                {selectedServices.length > 0 && (
-                    <div className="fixed bottom-8 left-1/2 transform translate-x-1/2 w-full max-w-md px-4 pointer-events-none">
-                        <button className="w-full pointer-events-auto bg-indigo-700 text-white py-4 rounded-2xl shadow-2xl font-bold text-lg hover:bg-indigo-800 transition transform hover:scale-105">
-                            انتقل للمقارنة وإرسال الطلب ({selectedServices.length * 10} XP+)
-                        </button>
+                            </Link>
+                        ))}
                     </div>
                 )}
             </div>
+
+            {/* CTA Section */}
+            <div className="bg-gradient-to-l from-purple-600 to-purple-800 text-white py-16 px-4 mt-16">
+                <div className="max-w-4xl mx-auto text-center">
+                    <h2 className="text-3xl font-bold mb-4">هل أنت مقدم خدمة؟</h2>
+                    <p className="text-xl text-purple-100 mb-8">
+                        انضم إلى منصتنا وابدأ في عرض خدماتك لآلاف العملاء
+                    </p>
+                    <Link
+                        href="/dashboard/services"
+                        className="inline-block bg-white text-purple-600 px-8 py-4 rounded-xl hover:bg-purple-50 transition font-bold text-lg shadow-xl"
+                    >
+                        ابدأ البيع الآن
+                    </Link>
+                </div>
+            </div>
         </div>
     );
-};
-
-export default ServicesPage;
+}

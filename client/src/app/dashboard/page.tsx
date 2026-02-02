@@ -9,6 +9,7 @@ import Link from 'next/link'
 // Placeholder components - in a real app these would be separate files
 const ClientDashboard = ({ profile }: { profile: any }) => {
     const [requests, setRequests] = useState<any[]>([])
+    const [bookings, setBookings] = useState<any[]>([])
 
     useEffect(() => {
         const fetchRequests = async () => {
@@ -20,7 +21,23 @@ const ClientDashboard = ({ profile }: { profile: any }) => {
 
             if (data) setRequests(data)
         }
+
+        const fetchBookings = async () => {
+            const { data } = await supabase
+                .from('bookings')
+                .select(`
+                    *,
+                    service:service_id(title, category),
+                    provider:provider_id(business_name, full_name)
+                `)
+                .eq('customer_id', profile.id)
+                .order('created_at', { ascending: false })
+
+            if (data) setBookings(data)
+        }
+
         fetchRequests()
+        fetchBookings()
     }, [profile.id])
 
     // Progress logic (example)

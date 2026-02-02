@@ -1,0 +1,202 @@
+/* AuthPortal.module.css */
+.container {
+    max-width: 450px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 2.5rem;
+    background: var(--surface);
+    border-radius: 24px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    direction: rtl;
+}
+
+.title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-bottom: 2rem;
+    text-align: center;
+    color: var(--primary);
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.inputGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.input {
+    width: 100%;
+    padding: 1rem;
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    outline: none;
+}
+
+.input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px rgba(74, 20, 140, 0.1);
+}
+
+.roleSelector {
+    display: flex;
+    gap: 1rem;
+    padding: 0.5rem 0;
+}
+
+.roleOption {
+    flex: 1;
+    position: relative;
+}
+
+.roleInput {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+}
+
+.roleLabel {
+    display: block;
+    padding: 0.8rem;
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    text-align: center;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: var(--text-muted);
+}
+
+.roleInput:checked+.roleLabel {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+    box-shadow: 0 4px 12px rgba(74, 20, 140, 0.2);
+}
+
+.submitButton {
+    width: 100%;
+    padding: 1.1rem;
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: white;
+    border: none;
+    border-radius: 14px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 1rem;
+}
+
+.submitButton:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(74, 20, 140, 0.3);
+}
+
+.submitButton:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.toggleLink {
+    margin-top: 1.5rem;
+    text-align: center;
+    font-size: 0.95rem;
+    color: var(--text-muted);
+}
+
+.toggleAction {
+    color: var(--primary);
+    font-weight: 700;
+    cursor: pointer;
+    margin-right: 0.5rem;
+}
+
+.toggleAction:hover {
+    text-decoration: underline;
+}
+
+/* Social Auth Styles */
+.divider {
+    position: relative;
+    margin: 1.5rem 0;
+    text-align: center;
+}
+
+.divider::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: var(--border);
+    z-index: 1;
+}
+
+.dividerText {
+    position: relative;
+    z-index: 2;
+    background: var(--surface);
+    padding: 0 1rem;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.socialGrid {
+    display: grid;
+    /* This is a logic hint, real CSS below */
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.socialButton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 0.8rem;
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    background: var(--surface);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.socialButton:hover {
+    background: #f8f9fa;
+    border-color: #cbd5e1;
+    transform: translateY(-1px);
+}
+
+.socialIcon {
+    width: 20px;
+    height: 20px;
+}
+
+.socialText {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-main);
+}
+
+.error {
+    color: #e53935;
+    background: #ffebee;
+    padding: 0.75rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+    text-align: center;
+}
