@@ -6,6 +6,8 @@ import { useSearchParams } from 'next/navigation'
 import EventRequestForm from '@/components/EventRequestForm'
 import Link from 'next/link'
 
+export const dynamic = 'force-dynamic'
+
 function RequestFormContent() {
     const searchParams = useSearchParams()
     const vendorId = searchParams.get('vendorId')

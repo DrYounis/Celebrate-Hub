@@ -6,6 +6,8 @@ import { useParams, useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabaseClient'
 import ChatRoom from '@/components/ChatRoom'
 
+export const dynamic = 'force-dynamic'
+
 export default function ChatPage() {
     const params = useParams()
     const requestId = params.requestId as string
