@@ -1,9 +1,11 @@
-
 'use client'
 
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabaseClient'
 import ComparisonTable, { Vendor } from '@/components/ComparisonTable'
+import Link from 'next/link'
+
+export const dynamic = 'force-dynamic'
 
 export default function ComparisonPage() {
     const [vendors, setVendors] = useState<Vendor[]>([])

@@ -271,6 +271,8 @@ const ContractorDashboard = ({ profile }: { profile: any }) => {
     )
 }
 
+export const dynamic = 'force-dynamic'
+
 export default function DashboardPage() {
     const [profile, setProfile] = useState<any>(null)
     const [loading, setLoading] = useState(true)
