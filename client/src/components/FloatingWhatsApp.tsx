@@ -36,14 +36,14 @@ export default function FloatingWhatsApp({
     const whatsappUrl = `https://wa.me/${whatsappPhone}?text=${whatsappMessage}`;
 
     const positionClasses = {
-        'bottom-right': 'bottom-6 right-6',
-        'bottom-left': 'bottom-6 left-6',
+        'bottom-right': 'bottom-8 right-8',
+        'bottom-left': 'bottom-8 left-8',
     };
 
     if (!isVisible) return null;
 
     return (
-        <div className={`fixed ${positionClasses[position]} z-50 group`}>
+        <div className={`!fixed ${positionClasses[position]} z-[9999] group animate-bounce duration-[2000ms]`}>
             {/* Tooltip */}
             <div className="absolute bottom-full mb-2 left-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
                 <div className="bg-gray-900 text-white px-4 py-2 rounded-lg text-sm whitespace-nowrap shadow-lg">
