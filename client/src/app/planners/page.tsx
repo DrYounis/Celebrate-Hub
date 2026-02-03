@@ -53,60 +53,53 @@ export default function PlannersPage() {
         <div className="min-h-screen bg-[#fdfdfd]" dir="rtl">
             <Header />
 
-            {/* Hero Section */}
-            <div className="relative h-[60vh] bg-[#1a1a1a] overflow-hidden flex items-center justify-center">
-                <div className="absolute inset-0 opacity-40 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')]"></div>
-                <div className="absolute inset-0 bg-gradient-to-b from-[#4a148c]/20 to-[#1a1a1a]"></div>
+            {/* Qondor Hero Section */}
+            <div className="relative h-[70vh] bg-[#0D0032] overflow-hidden flex items-center justify-center">
+                {/* Abstract 3D Shapes */}
+                <div className="absolute top-10 right-20 w-32 h-32 bg-[#D9FF5B] rounded-full blur-[80px] opacity-20 animate-pulse"></div>
+                <div className="absolute bottom-10 left-20 w-64 h-64 bg-[#EBE2FF] rounded-full blur-[100px] opacity-10"></div>
+                <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
 
                 <div className="relative z-10 text-center px-4 max-w-4xl mx-auto animate-in slide-in-from-bottom-8 duration-1000">
-                    <h1 className="text-5xl md:text-7xl font-light text-white mb-6 tracking-wide font-['Cairo']">
-                        حيث يلتقي <span className="text-[#D4AF37] font-bold">الإبداع</span> بالفخامة
+                    <span className="inline-block px-4 py-2 bg-[#1a0536] text-[#D9FF5B] rounded-full text-sm font-bold mb-6 border border-[#2a1050]">
+                        Event Management 2.0
+                    </span>
+                    <h1 className="text-5xl md:text-8xl font-black text-white mb-8 tracking-tight font-['Cairo']">
+                        الفاعلية <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#D9FF5B] to-[#bce63b]">تتحدث</span>
                     </h1>
-                    <p className="text-xl md:text-2xl text-gray-300 font-light max-w-2xl mx-auto leading-relaxed">
-                        في Celebrate Hub، نحن لا ننظم الحفلات فحسب، بل نصنع ذكريات تليق بك.
+                    <p className="text-xl md:text-2xl text-gray-300 font-medium max-w-2xl mx-auto leading-relaxed">
+                        حلول تقنية متكاملة لإدارة الحشود، التنظيم اللوجستي، وتصميم التجارب الاستثنائية.
                     </p>
                     <div className="mt-12 flex justify-center gap-4">
-                        <button onClick={() => document.getElementById('consultation-grid')?.scrollIntoView({ behavior: 'smooth' })} className="border border-[#D4AF37] text-[#D4AF37] px-8 py-3 rounded-full hover:bg-[#D4AF37] hover:text-[#1a1a1a] transition-all duration-500 uppercase tracking-widest text-sm font-bold">
-                            خدماتنا
+                        <button onClick={() => document.getElementById('consultation-grid')?.scrollIntoView({ behavior: 'smooth' })} className="bg-[#D9FF5B] text-[#0D0032] px-10 py-4 rounded-full hover:bg-[#c9f046] transition-all duration-300 text-lg font-bold shadow-[0_0_20px_rgba(217,255,91,0.3)]">
+                            اكتشف حلولنا
                         </button>
                     </div>
                 </div>
             </div>
 
             <div id="consultation-grid" className="max-w-7xl mx-auto py-24 px-6 relative">
-                {/* Background Decorative */}
-                <div className="absolute top-0 right-0 w-64 h-64 bg-[#D4AF37]/5 rounded-full blur-3xl -z-10"></div>
-                <div className="absolute bottom-0 left-0 w-96 h-96 bg-[#4a148c]/5 rounded-full blur-3xl -z-10"></div>
-
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    {/* First Item: Featured (Purple) */}
-                    <div className="md:col-span-2 bg-[#4a148c] text-white rounded-[2rem] p-12 relative overflow-hidden group shadow-2xl animate-in fade-in slide-in-from-bottom-8">
-                        <div className="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
+                    {/* First Item: Featured (Navy) */}
+                    <div className="md:col-span-2 bg-[#0D0032] text-white rounded-[3rem] p-12 relative overflow-hidden group shadow-2xl animate-in fade-in slide-in-from-bottom-8">
+                        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#D9FF5B]/10 rounded-full blur-3xl -z-0"></div>
                         <div className="relative z-10 flex flex-col md:flex-row items-center gap-12">
                             <div className="flex-1 text-center md:text-right">
-                                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-white/10 mb-6 text-[#D4AF37] border border-[#D4AF37]/30">
+                                <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-white/10 mb-8 text-[#D9FF5B] border border-[#D9FF5B]/30 backdrop-blur-sm">
                                     {services[0].icon}
                                 </div>
-                                <h2 className="text-4xl font-bold mb-2">{services[0].title}</h2>
-                                <p className="text-[#D4AF37] uppercase tracking-widest text-sm mb-6">{services[0].subtitle}</p>
-                                <p className="text-purple-100 text-lg leading-relaxed mb-8 max-w-xl">
+                                <h2 className="text-5xl font-extrabold mb-4">{services[0].title}</h2>
+                                <p className="text-[#D9FF5B] uppercase tracking-widest text-sm font-bold mb-6">{services[0].subtitle}</p>
+                                <p className="text-gray-300 text-xl leading-relaxed mb-10 max-w-xl">
                                     {services[0].description}
                                 </p>
-                                <ul className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
-                                    {services[0].features.map((f, i) => (
-                                        <li key={i} className="flex items-center gap-3 text-sm">
-                                            <CheckCircle size={16} className="text-[#D4AF37]" /> {f}
-                                        </li>
-                                    ))}
-                                </ul>
-                                <button className="bg-[#D4AF37] text-[#1a1a1a] px-8 py-3 rounded-full font-bold hover:bg-white transition-colors shadow-lg shadow-black/20">
-                                    طلب عرض سعر
+                                <button className="bg-[#D9FF5B] text-[#0D0032] px-10 py-4 rounded-full font-bold hover:bg-white transition-colors shadow-lg">
+                                    احجز استشارة
                                 </button>
                             </div>
-                            <div className="flex-1 h-64 w-full bg-black/20 rounded-xl overflow-hidden relative">
-                                {/* Placeholder for Wedding Image */}
-                                <div className="absolute inset-0 bg-gradient-to-tr from-[#38006b] to-transparent"></div>
-                                <div className="absolute bottom-4 right-4 text-white/50 text-xs">صورة تعبيرية</div>
+                            <div className="flex-1 h-80 w-full bg-[#1a0536] rounded-[2rem] border border-[#2a1050] relative overflow-hidden">
+                                <div className="absolute inset-0 bg-gradient-to-tr from-[#0D0032] via-transparent to-transparent z-10"></div>
+                                <div className="absolute inset-0 flex items-center justify-center text-[#2a1050] font-black text-9xl opacity-20">01</div>
                             </div>
                         </div>
                     </div>
@@ -115,35 +108,33 @@ export default function PlannersPage() {
                     {services.slice(1).map((service, idx) => (
                         <div
                             key={service.id}
-                            className="bg-white p-10 rounded-[2rem] border border-gray-100 hover:border-[#D4AF37]/30 hover:shadow-xl transition-all duration-500 group animate-in fade-in slide-in-from-bottom-8 fill-mode-backwards"
+                            className="bg-white p-12 rounded-[3rem] border border-[#EBE2FF] hover:border-[#D9FF5B] hover:shadow-2xl transition-all duration-500 group animate-in fade-in slide-in-from-bottom-8 fill-mode-backwards flex flex-col justify-between"
                             style={{ animationDelay: `${(idx + 1) * 150}ms` }}
                         >
-                            <div className="flex justify-between items-start mb-8">
-                                <div className="w-14 h-14 bg-gray-50 rounded-2xl flex items-center justify-center text-[#4a148c] group-hover:bg-[#4a148c] group-hover:text-white transition-colors duration-500">
+                            <div>
+                                <div className="w-16 h-16 bg-[#EBE2FF] rounded-2xl flex items-center justify-center text-[#0D0032] group-hover:bg-[#0D0032] group-hover:text-[#D9FF5B] transition-colors duration-500 mb-8">
                                     {service.icon}
                                 </div>
-                                <span className="text-5xl font-serif text-gray-100 font-bold group-hover:text-[#D4AF37]/20 transition-colors">0{service.id}</span>
+
+                                <h3 className="text-3xl font-extrabold text-[#0D0032] mb-2">{service.title}</h3>
+                                <p className="text-xs text-gray-400 font-bold uppercase tracking-wider mb-6">{service.subtitle}</p>
+
+                                <p className="text-gray-600 mb-8 leading-relaxed text-lg">
+                                    {service.description}
+                                </p>
                             </div>
 
-                            <h3 className="text-2xl font-bold text-[#1a1a1a] mb-1">{service.title}</h3>
-                            <p className="text-xs text-gray-400 uppercase tracking-wider mb-4">{service.subtitle}</p>
+                            <div>
+                                <div className="flex flex-wrap gap-2 mb-8">
+                                    {service.features.map((f, i) => (
+                                        <span key={i} className="px-3 py-1 bg-[#f0f0f0] rounded-full text-xs font-bold text-gray-500">
+                                            {f}
+                                        </span>
+                                    ))}
+                                </div>
 
-                            <p className="text-gray-600 mb-8 leading-relaxed h-16">
-                                {service.description}
-                            </p>
-
-                            <div className="space-y-3 mb-8">
-                                {service.features.map((f, i) => (
-                                    <div key={i} className="flex items-center gap-2 text-sm text-gray-500">
-                                        <div className="w-1.5 h-1.5 rounded-full bg-[#D4AF37]"></div>
-                                        {f}
-                                    </div>
-                                ))}
-                            </div>
-
-                            <div className="pt-6 border-t border-gray-50 flex justify-end">
-                                <Link href="/dashboard/services" className="text-[#4a148c] font-bold text-sm flex items-center gap-2 hover:gap-4 transition-all">
-                                    تفاصيل أكثر <ArrowLeft size={16} />
+                                <Link href="/dashboard/services" className="inline-flex items-center justify-center w-full bg-[#f8f9fa] text-[#0D0032] py-4 rounded-full font-bold hover:bg-[#0D0032] hover:text-white transition-all group-hover:shadow-lg">
+                                    عرض التفاصيل
                                 </Link>
                             </div>
                         </div>
@@ -151,12 +142,13 @@ export default function PlannersPage() {
                 </div>
             </div>
 
-            {/* Footer CTA */}
-            <div className="bg-[#1a1a1a] border-t border-white/5 py-16 text-center">
-                <h2 className="text-2xl text-white font-light mb-8">هل لديك استفسار خاص؟</h2>
-                <button onClick={() => document.getElementById('smart-concierge-trigger')?.click()} className="inline-flex items-center gap-3 bg-white/5 border border-white/10 text-white px-8 py-4 rounded-xl hover:bg-white hover:text-black transition-all duration-300 backdrop-blur-sm">
-                    <Crown size={20} className="text-[#D4AF37]" />
-                    محادثة مع المنسق الذكي
+            {/* Qondor Footer CTA */}
+            <div className="bg-[#0D0032] py-24 text-center relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#D9FF5B] to-transparent opacity-30"></div>
+                <h2 className="text-4xl text-white font-black mb-8">جاهز لتجربة "Qondor Style"؟</h2>
+                <button onClick={() => document.getElementById('smart-concierge-trigger')?.click()} className="inline-flex items-center gap-3 bg-[#D9FF5B] text-[#0D0032] px-12 py-5 rounded-full hover:bg-white transition-all duration-300 shadow-[0_0_30px_rgba(217,255,91,0.2)] font-bold text-lg">
+                    <Crown size={24} className="text-[#0D0032]" />
+                    ابدأ التخطيط الذكي
                 </button>
             </div>
         </div>

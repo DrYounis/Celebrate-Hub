@@ -1,22 +1,30 @@
 @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap');
 
 :root {
-  /* Brand Colors */
-  --primary: #4a148c; /* Royal Purple */
-  --primary-dark: #38006b;
-  --secondary: #D4AF37; /* Metallic Gold */
-  --secondary-light: #f3cf55;
-  --accent: #fbc02d;
-  
+  /* Qondor-inspired Palette */
+  --primary: #0D0032;
+  /* Deep Navy */
+  --primary-light: #1a0536;
+  --secondary: #D9FF5B;
+  /* Lime Green Accent */
+  --secondary-hover: #bce63b;
+  --accent: #EBE2FF;
+  /* Light Lavender */
+
   /* Neutral Colors */
   --background: #fdfdfd;
   --surface: #ffffff;
-  --text-main: #1a1a1a;
-  --text-muted: #666666;
-  --border: #e0e0e0;
-  
+  --text-main: #0D0032;
+  /* Navy Text */
+  --text-muted: #4a4a4a;
+  --border: #f0f0f0;
+
   /* Font */
   --font-main: 'Cairo', sans-serif;
+
+  /* Shapes */
+  --radius-card: 2rem;
+  --radius-btn: 9999px;
 }
 
 * {
@@ -32,7 +40,8 @@ body {
   font-family: var(--font-main);
   background-color: var(--background);
   color: var(--text-main);
-  direction: rtl; /* Force RTL for Arabic */
+  direction: rtl;
+  /* Force RTL for Arabic */
 }
 
 a {

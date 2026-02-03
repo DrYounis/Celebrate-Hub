@@ -101,32 +101,31 @@ export default function ServicesPage() {
         <div className="min-h-screen bg-[#fdfdfd]" dir="rtl">
             <Header />
 
-            {/* Luxurious Hero Section */}
-            <div className="relative bg-[#4a148c] text-white py-24 px-4 overflow-hidden">
-                <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/arabesque.png')]"></div>
-                <div className="absolute inset-0 bg-gradient-to-t from-[#4a148c] via-transparent to-transparent"></div>
+            {/* Qondor-Style Hero Section */}
+            <div className="relative bg-[#0D0032] text-white py-24 px-4 overflow-hidden">
+                <div className="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
 
                 <div className="relative max-w-7xl mx-auto text-center z-10">
-                    <span className="text-[#D4AF37] tracking-[0.2em] font-medium text-sm mb-4 block animate-in slide-in-from-bottom-2 fade-in">
-                        الفخامة . الأصالة . التميز
+                    <span className="text-[#D9FF5B] tracking-[0.2em] font-bold text-sm mb-4 block animate-in slide-in-from-bottom-2 fade-in uppercase">
+                        Technology x Events
                     </span>
-                    <h1 className="text-4xl md:text-6xl font-bold mb-6 font-['Cairo'] animate-in slide-in-from-bottom-4 fade-in delay-75">
-                        وجهتك الأولى للمناسبات الراقية
+                    <h1 className="text-4xl md:text-6xl font-extrabold mb-6 font-['Cairo'] animate-in slide-in-from-bottom-4 fade-in delay-75 leading-tight">
+                        بوابتك الذكية <br /> <span className="text-[#D9FF5B]">لتخطيط المستقبل</span>
                     </h1>
 
-                    {/* Golden Search Bar */}
+                    {/* Tech-Style Search Bar */}
                     <div className="max-w-2xl mx-auto mt-12 relative animate-in zoom-in duration-500 delay-150">
-                        <div className="bg-white/95 backdrop-blur-md rounded-full shadow-2xl p-2 flex items-center border border-[#D4AF37]/30 ring-4 ring-[#D4AF37]/10 transition-all focus-within:ring-[#D4AF37]/30 focus-within:scale-[1.02]">
-                            <Search className="text-[#D4AF37] mr-4 ml-2" size={24} />
+                        <div className="bg-white rounded-full shadow-2xl p-2 flex items-center border-4 border-[#EBE2FF] focus-within:border-[#D9FF5B] transition-colors">
+                            <Search className="text-[#0D0032] mr-4 ml-2" size={24} />
                             <input
                                 type="text"
-                                placeholder="ابحث عن قاعة، فندق، أو خدمات VIP..."
+                                placeholder="ابحث عن قاعات، خدمات، أو تقنيات..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="flex-1 bg-transparent border-none outline-none text-gray-800 placeholder-gray-400 h-10 px-2"
+                                className="flex-1 bg-transparent border-none outline-none text-[#0D0032] placeholder-gray-400 h-12 px-2 font-medium"
                             />
-                            <button className="bg-[#4a148c] text-white px-8 py-3 rounded-full font-bold hover:bg-[#38006b] transition-colors shadow-lg">
-                                بحث
+                            <button className="bg-[#D9FF5B] text-[#0D0032] px-8 py-3 rounded-full font-bold hover:bg-[#c9f046] transition-colors shadow-lg shadow-[#D9FF5B]/20">
+                                ابحث الآن
                             </button>
                         </div>
                     </div>
@@ -134,14 +133,14 @@ export default function ServicesPage() {
             </div>
 
             <div className="max-w-7xl mx-auto px-4 py-16">
-                {/* Elegant Filters */}
+                {/* Tech Pill Filters */}
                 <div className="mb-12 overflow-x-auto pb-4 scrollbar-hide">
-                    <div className="flex bg-white p-2 rounded-full shadow-sm border border-gray-100 w-max mx-auto gap-1">
+                    <div className="flex justify-center gap-3">
                         <button
                             onClick={() => setSelectedCategory('all')}
-                            className={`px-6 py-2 rounded-full font-bold transition-all duration-300 ${selectedCategory === 'all'
-                                ? 'bg-[#4a148c] text-white shadow-md transform scale-105'
-                                : 'text-gray-500 hover:text-[#4a148c] hover:bg-purple-50'
+                            className={`px-6 py-3 rounded-full font-bold transition-all duration-300 border-2 ${selectedCategory === 'all'
+                                ? 'bg-[#0D0032] text-white border-[#0D0032] shadow-xl'
+                                : 'bg-white text-[#0D0032] border-[#EBE2FF] hover:border-[#D9FF5B]'
                                 }`}
                         >
                             الكل
@@ -150,9 +149,9 @@ export default function ServicesPage() {
                             <button
                                 key={key}
                                 onClick={() => setSelectedCategory(key)}
-                                className={`px-6 py-2 rounded-full font-bold transition-all duration-300 whitespace-nowrap ${selectedCategory === key
-                                    ? 'bg-[#4a148c] text-white shadow-md transform scale-105'
-                                    : 'text-gray-500 hover:text-[#4a148c] hover:bg-purple-50'
+                                className={`px-6 py-3 rounded-full font-bold transition-all duration-300 border-2 whitespace-nowrap ${selectedCategory === key
+                                    ? 'bg-[#0D0032] text-white border-[#0D0032] shadow-xl'
+                                    : 'bg-white text-[#0D0032] border-[#EBE2FF] hover:border-[#D9FF5B]'
                                     }`}
                             >
                                 {label}
@@ -163,11 +162,11 @@ export default function ServicesPage() {
 
                 {/* Refined Grid */}
                 {filteredServices.length === 0 ? (
-                    <div className="text-center py-24 bg-white rounded-[2rem] border border-gray-100 shadow-sm">
-                        <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6">
-                            <Search className="text-gray-300" size={32} />
+                    <div className="text-center py-24 bg-white rounded-[2.5rem] border border-gray-100 shadow-sm">
+                        <div className="w-20 h-20 bg-[#EBE2FF] rounded-full flex items-center justify-center mx-auto mb-6">
+                            <Search className="text-[#0D0032]" size={32} />
                         </div>
-                        <h3 className="text-2xl font-bold text-gray-800 mb-2">عذراً، لم نجد نتائج</h3>
+                        <h3 className="text-2xl font-bold text-[#0D0032] mb-2">عذراً، لم نجد نتائج</h3>
                         <p className="text-gray-500">حاول البحث بكلمات مختلفة أو تصفح فئات أخرى</p>
                     </div>
                 ) : (
@@ -176,23 +175,23 @@ export default function ServicesPage() {
                             <Link
                                 key={service.id}
                                 href={`/services/${service.id}`}
-                                className="group bg-white rounded-[20px] overflow-hidden border border-[#e0e0e0] hover:border-[#D4AF37]/50 transition-all duration-500 hover:shadow-[0_10px_40px_-10px_rgba(0,0,0,0.1)] hover:-translate-y-1 block animate-in fade-in slide-in-from-bottom-8 fill-mode-backwards"
+                                className="group bg-white rounded-[2.5rem] overflow-hidden border border-[#EBE2FF] hover:border-[#D9FF5B] transition-all duration-300 hover:shadow-xl hover:-translate-y-1 block animate-in fade-in slide-in-from-bottom-8 fill-mode-backwards"
                                 style={{ animationDelay: `${index * 100}ms` }}
                             >
                                 {/* Card Image Area */}
-                                <div className="h-64 relative overflow-hidden bg-gray-100">
-                                    <div className={`absolute inset-0 bg-gradient-to-tr transition-opacity duration-500 ${service.is_external ? 'from-blue-900/40 to-transparent' : 'from-[#4a148c]/40 to-transparent'} opacity-0 group-hover:opacity-100`}></div>
+                                <div className="h-64 relative overflow-hidden bg-[#EBE2FF]">
+                                    <div className={`absolute inset-0 bg-gradient-to-tr transition-opacity duration-500 ${service.is_external ? 'from-blue-900/40 to-transparent' : 'from-[#0D0032]/40 to-transparent'} opacity-0 group-hover:opacity-100`}></div>
 
                                     {/* Placeholder Gradient if no image (real app would use Image) */}
-                                    <div className="w-full h-full bg-gradient-to-br from-gray-200 to-gray-300 group-hover:scale-105 transition-transform duration-700"></div>
+                                    <div className="w-full h-full bg-gradient-to-br from-[#f8f9fa] to-[#e9ecef] group-hover:scale-105 transition-transform duration-700"></div>
 
                                     {/* Badges */}
                                     <div className="absolute top-4 right-4 flex gap-2">
-                                        <span className="bg-white/90 backdrop-blur-sm text-[#4a148c] px-3 py-1 rounded-full text-xs font-bold shadow-sm">
+                                        <span className="bg-white text-[#0D0032] px-4 py-1.5 rounded-full text-xs font-bold shadow-md">
                                             {categoryLabels[service.category]}
                                         </span>
                                         {service.is_external && (
-                                            <span className="bg-[#4285F4] text-white px-3 py-1 rounded-full text-xs font-bold shadow-sm flex items-center gap-1">
+                                            <span className="bg-[#4285F4] text-white px-3 py-1.5 rounded-full text-xs font-bold shadow-md flex items-center gap-1">
                                                 <MapPin size={10} /> Google Maps
                                             </span>
                                         )}
@@ -200,23 +199,23 @@ export default function ServicesPage() {
                                 </div>
 
                                 {/* Card Content */}
-                                <div className="p-6 relative">
-                                    <h3 className="text-xl font-bold text-[#1a1a1a] mb-2 line-clamp-1 group-hover:text-[#4a148c] transition-colors">
+                                <div className="p-8 relative">
+                                    <h3 className="text-2xl font-bold text-[#0D0032] mb-3 line-clamp-1 group-hover:text-[#4a148c] transition-colors">
                                         {service.title}
                                     </h3>
 
-                                    <div className="flex items-center gap-2 mb-4 text-[#666666] text-sm">
-                                        <MapPin size={14} className="text-[#D4AF37]" />
+                                    <div className="flex items-center gap-2 mb-6 text-[#666666] text-sm font-medium">
+                                        <MapPin size={16} className="text-[#D9FF5B]" />
                                         <span>{service.location}</span>
                                     </div>
 
-                                    <div className="flex items-center justify-between border-t border-gray-100 pt-4 mt-2">
-                                        <div className="flex items-center gap-1">
+                                    <div className="flex items-center justify-between border-t border-[#f0f0f0] pt-6 mt-2">
+                                        <div className="flex items-center gap-1 bg-[#f8f9fa] px-3 py-1 rounded-full">
                                             {service.average_rating > 0 ? (
                                                 <>
-                                                    <Star size={16} className="text-[#D4AF37] fill-[#D4AF37]" />
-                                                    <span className="font-bold">{service.average_rating.toFixed(1)}</span>
-                                                    <span className="text-xs text-gray-400">({service.total_reviews})</span>
+                                                    <Star size={14} className="text-[#0D0032] fill-[#0D0032]" />
+                                                    <span className="font-bold text-[#0D0032]">{service.average_rating.toFixed(1)}</span>
+                                                    <span className="text-xs text-gray-500">({service.total_reviews})</span>
                                                 </>
                                             ) : (
                                                 <span className="text-xs text-gray-400">جديد</span>
@@ -224,11 +223,11 @@ export default function ServicesPage() {
                                         </div>
 
                                         <div className="text-left">
-                                            <p className="text-[#D4AF37] font-bold text-lg">
+                                            <p className="text-[#0D0032] font-black text-xl">
                                                 {typeof service.base_price === 'number' ? (
-                                                    <>{service.base_price.toLocaleString()} <span className="text-xs text-gray-500">ريال</span></>
+                                                    <>{service.base_price.toLocaleString()} <span className="text-xs font-medium text-gray-500">ريال</span></>
                                                 ) : (
-                                                    <span className="text-sm">{service.base_price}</span>
+                                                    <span className="text-sm font-bold">{service.base_price}</span>
                                                 )}
                                             </p>
                                         </div>
@@ -240,15 +239,15 @@ export default function ServicesPage() {
                 )}
             </div>
 
-            {/* Minimalist CTA */}
-            <div className="bg-[#1a1a1a] text-[#fcfaf7] py-20 text-center">
+            {/* Tech CTA */}
+            <div className="bg-[#EBE2FF] py-24 text-center rounded-t-[3rem] mx-4 mt-8">
                 <div className="max-w-3xl mx-auto px-4">
-                    <h2 className="text-3xl font-light mb-6">هل تمتلك خدمات استثنائية؟</h2>
-                    <p className="text-gray-400 mb-8 font-light">
-                        انضم إلى نخبة مقدمي الخدمات في المملكة وشارك في صياغة أفخم المناسبات.
+                    <h2 className="text-4xl font-extrabold text-[#0D0032] mb-6">جاهز لإطلاق فعاليتك؟</h2>
+                    <p className="text-[#0D0032]/70 mb-10 text-lg font-medium">
+                        انضم إلى منصة النخبة وواكب مستقبل إدارة الفعاليات
                     </p>
-                    <Link href="/dashboard/services" className="inline-block border border-[#D4AF37] text-[#D4AF37] px-10 py-3 rounded-full hover:bg-[#D4AF37] hover:text-black transition-all duration-300 uppercase tracking-widest text-sm font-bold">
-                        انضم إلينا
+                    <Link href="/dashboard/services" className="inline-block bg-[#0D0032] text-white px-12 py-4 rounded-full hover:bg-[#1a0536] transition-all duration-300 shadow-xl text-lg font-bold">
+                        ابدأ الآن مجاناً
                     </Link>
                 </div>
             </div>
