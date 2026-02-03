@@ -50,6 +50,7 @@ export const Header = () => {
                 <Link href="/" className={styles.navLink}>الرئيسية</Link>
                 <Link href="/services" className={styles.navLink}>الخدمات</Link>
                 <Link href="/planners" className={styles.navLink}>منظمون</Link>
+                <Link href="/academy" className={`${styles.navLink} text-[#8B5CF6] font-bold`}>الأكاديمية 🎓</Link>
                 <Link href="/contact" className={styles.navLink}>تواصل معنا</Link>
             </nav>
 

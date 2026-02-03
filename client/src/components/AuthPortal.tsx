@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import styles from './AuthPortal.module.css';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 interface AuthPortalProps {
     onSuccess?: () => void;
@@ -11,6 +11,8 @@ interface AuthPortalProps {
 
 export const AuthPortal: React.FC<AuthPortalProps> = ({ onSuccess }) => {
     const router = useRouter();
+    const searchParams = useSearchParams();
+
     const [isLogin, setIsLogin] = useState(true);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -18,7 +20,17 @@ export const AuthPortal: React.FC<AuthPortalProps> = ({ onSuccess }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [fullName, setFullName] = useState('');
-    const [role, setRole] = useState<'free' | 'pro'>('free');
+    // New roles added
+    const [role, setRole] = useState<'free' | 'pro' | 'investor' | 'entrepreneur'>('free');
+
+    useEffect(() => {
+        // Auto-select role based on URL param (e.g. from Academy page)
+        const typeParam = searchParams.get('type');
+        if (typeParam === 'entrepreneur') {
+            setRole('entrepreneur');
+            setIsLogin(false); // Switch to registration mode
+        }
+    }, [searchParams]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -42,12 +54,19 @@ export const AuthPortal: React.FC<AuthPortalProps> = ({ onSuccess }) => {
                         data: {
                             full_name: fullName,
                             role: role,
+                            // Flag for Academy enrollments
+                            is_marfa_enrolled: role === 'entrepreneur',
                             total_points: role === 'free' ? 50 : 0
                         }
                     }
                 });
                 if (signUpError) throw signUpError;
-                alert('تم التسجيل بنجاح! افحص بريدك لتأكيد الحساب');
+
+                if (role === 'investor') {
+                    alert('تم استلام طلبك! حساب المستثمر يحتاج لموافقة الإدارة.');
+                } else {
+                    alert('تم التسجيل بنجاح! افحص بريدك لتأكيد الحساب');
+                }
             }
 
             if (onSuccess) onSuccess();
@@ -99,6 +118,7 @@ export const AuthPortal: React.FC<AuthPortalProps> = ({ onSuccess }) => {
 
                 {!isLogin && (
                     <div className={styles.roleSelector}>
+                        {/* Core Event Hub Roles */}
                         <label className={styles.roleOption}>
                             <input
                                 type="radio"
@@ -120,6 +140,32 @@ export const AuthPortal: React.FC<AuthPortalProps> = ({ onSuccess }) => {
                                 className={styles.roleInput}
                             />
                             <div className={styles.roleLabel}>مقدم خدمة (Pro)</div>
+                        </label>
+
+                        {/* New Marfa/Investment Roles */}
+                        <div className="w-full border-t border-gray-200 my-2 pt-2 text-xs text-gray-400 text-center">أكاديمية مرفأ & الاستثمار</div>
+
+                        <label className={styles.roleOption}>
+                            <input
+                                type="radio"
+                                name="role"
+                                value="entrepreneur"
+                                checked={role === 'entrepreneur'}
+                                onChange={() => setRole('entrepreneur')}
+                                className={styles.roleInput}
+                            />
+                            <div className={styles.roleLabel}>رائد أعمال (أكاديمية مرفأ)</div>
+                        </label>
+                        <label className={styles.roleOption}>
+                            <input
+                                type="radio"
+                                name="role"
+                                value="investor"
+                                checked={role === 'investor'}
+                                onChange={() => setRole('investor')}
+                                className={styles.roleInput}
+                            />
+                            <div className={styles.roleLabel}>مستثمر (يتطلب موافقة)</div>
                         </label>
                     </div>
                 )}

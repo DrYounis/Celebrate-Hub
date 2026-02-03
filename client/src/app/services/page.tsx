@@ -1,255 +1,211 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
-import { Search, MapPin, Users, Star, Filter, ArrowLeft, Crown } from 'lucide-react';
-import { Header } from '@/components/Header';
-import { HAIL_VENUES } from '@/lib/hail-data';
+import { Star, MapPin, Filter, Search, ArrowRight } from 'lucide-react';
 
-interface Service {
-    id: string;
-    title: string;
-    description: string;
-    category: string;
-    base_price: number | string;
-    location: string;
-    capacity: number;
-    average_rating: number;
-    total_reviews: number;
-    provider_id: string;
-    is_external?: boolean;
-    profiles: {
-        business_name: string;
-    };
-}
+const MOCK_SERVICES = [
+    {
+        id: 1,
+        title: "القاعة الملكية الكبرى",
+        category: "قاعات",
+        price: "50,000",
+        rating: 4.9,
+        location: "الرياض - حي الخزامى",
+        image: "https://images.unsplash.com/photo-1519167758481-83f550bb49b3?q=80&w=2098&auto=format&fit=crop",
+        verified: true
+    },
+    {
+        id: 2,
+        title: "بوفيه الأناقة الفرنسية",
+        category: "ضيافة",
+        price: "15,000",
+        rating: 4.8,
+        location: "جدة - الكورنيش",
+        image: "https://images.unsplash.com/photo-1555244162-803834f70033?q=80&w=2070&auto=format&fit=crop",
+        verified: true
+    },
+    {
+        id: 3,
+        title: "تصوير سينمائي احترافي",
+        category: "تصوير",
+        price: "8,000",
+        rating: 5.0,
+        location: "الدمام",
+        image: "https://images.unsplash.com/photo-1520390138845-fd2d229dd552?q=80&w=2032&auto=format&fit=crop",
+        verified: true
+    },
+    {
+        id: 4,
+        title: "فرقة الموسيقى الكلاسيكية",
+        category: "ترفيه",
+        price: "12,000",
+        rating: 4.7,
+        location: "الرياض",
+        image: "https://images.unsplash.com/photo-1465847899078-b413929f7120?q=80&w=2070&auto=format&fit=crop",
+        verified: false
+    },
+    {
+        id: 5,
+        title: "تنسيق زهور هولندي فاخر",
+        category: "ديكور",
+        price: "25,000",
+        rating: 4.9,
+        location: "الرياض - العليا",
+        image: "https://images.unsplash.com/photo-1527529482837-4698179dc6ce?q=80&w=2070&auto=format&fit=crop",
+        verified: true
+    },
+    {
+        id: 6,
+        title: "خدمة صف السيارات VIP",
+        category: "لوجستيك",
+        price: "5,000",
+        rating: 4.6,
+        location: "جميع المناطق",
+        image: "https://images.unsplash.com/photo-1485291571150-772bcfc10da5?q=80&w=2128&auto=format&fit=crop",
+        verified: true
+    }
+];
 
-const categoryLabels: Record<string, string> = {
-    venue: 'قاعات ملكية',
-    catering: 'ضيافة فاخرة',
-    photography: 'توثيق اللحظات',
-    decoration: 'ديكور وتصاميم',
-    entertainment: 'عروض فنية',
-    planning: 'تخطيط شامل',
-    other: 'خدمات أخرى',
-};
+const CATEGORIES = ["الكل", "قاعات", "ضيافة", "تصوير", "ديكور", "ترفيه", "لوجستيك"];
 
 export default function ServicesPage() {
-    const [services, setServices] = useState<Service[]>([]);
-    const [filteredServices, setFilteredServices] = useState<Service[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [selectedCategory, setSelectedCategory] = useState<string>('all');
-    const [searchQuery, setSearchQuery] = useState('');
+    const [activeCategory, setActiveCategory] = useState("الكل");
+    const [searchQuery, setSearchQuery] = useState("");
 
-    useEffect(() => {
-        fetchServices();
-    }, []);
-
-    useEffect(() => {
-        filterServices();
-    }, [selectedCategory, searchQuery, services]);
-
-    const fetchServices = async () => {
-        try {
-            const params = new URLSearchParams();
-            if (searchQuery) params.append('q', searchQuery);
-            if (selectedCategory && selectedCategory !== 'all') params.append('category', selectedCategory);
-
-            const res = await fetch(`/api/search?${params.toString()}`);
-            const data = await res.json();
-
-            if (data.services) {
-                setServices(data.services);
-                setFilteredServices(data.services);
-            }
-        } catch (error) {
-            console.error('Error fetching services:', error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const filterServices = () => {
-        let filtered = services;
-        if (selectedCategory !== 'all') {
-            filtered = filtered.filter(s => s.category === selectedCategory);
-        }
-        if (searchQuery) {
-            const q = searchQuery.toLowerCase();
-            filtered = filtered.filter(s =>
-                s.title.toLowerCase().includes(q) ||
-                s.description?.toLowerCase().includes(q) ||
-                s.location?.toLowerCase().includes(q)
-            );
-        }
-        setFilteredServices(filtered);
-    };
-
-    if (loading) {
-        return (
-            <div className="min-h-screen flex items-center justify-center bg-[#fdfdfd]">
-                <div className="relative">
-                    <div className="w-16 h-16 border-4 border-[#e0e0e0] border-t-[#D4AF37] rounded-full animate-spin"></div>
-                    <div className="absolute inset-0 flex items-center justify-center">
-                        <Crown size={20} className="text-[#D4AF37]" />
-                    </div>
-                </div>
-            </div>
-        );
-    }
+    const filteredServices = MOCK_SERVICES.filter(service => {
+        const matchesCategory = activeCategory === "الكل" || service.category === activeCategory;
+        const matchesSearch = service.title.includes(searchQuery) || service.location.includes(searchQuery);
+        return matchesCategory && matchesSearch;
+    });
 
     return (
-        <div className="min-h-screen bg-[#fdfdfd]" dir="rtl">
-            <Header />
+        <div className="min-h-screen bg-[#050505] text-white font-sans selection:bg-[#D4AF37] selection:text-black">
+            {/* Decorative Background Elements */}
+            <div className="fixed inset-0 z-0 pointer-events-none">
+                <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-[#D4AF37]/10 rounded-full blur-[120px]"></div>
+                <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] bg-[#4B0082]/10 rounded-full blur-[120px]"></div>
+            </div>
 
-            {/* Qondor-Style Hero Section */}
-            <div className="relative bg-[#0D0032] text-white py-24 px-4 overflow-hidden">
-                <div className="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
+            <div className="relative z-10 max-w-7xl mx-auto px-6 py-24">
 
-                <div className="relative max-w-7xl mx-auto text-center z-10">
-                    <span className="text-[#D9FF5B] tracking-[0.2em] font-bold text-sm mb-4 block animate-in slide-in-from-bottom-2 fade-in uppercase">
-                        Technology x Events
+                {/* Header Section */}
+                <div className="text-center mb-20 space-y-6">
+                    <span className="inline-block py-1 px-3 border border-[#D4AF37] rounded-full text-[#D4AF37] text-xs tracking-widest uppercase mb-4">
+                        Elite Collection
                     </span>
-                    <h1 className="text-4xl md:text-6xl font-extrabold mb-6 font-['Cairo'] animate-in slide-in-from-bottom-4 fade-in delay-75 leading-tight">
-                        بوابتك الذكية <br /> <span className="text-[#D9FF5B]">لتخطيط المستقبل</span>
+                    <h1 className="text-5xl md:text-7xl font-light tracking-tight mb-6">
+                        <span className="font-serif italic text-gray-400">Discover</span> <span className="text-white font-bold">Perfection</span>
                     </h1>
+                    <p className="text-gray-400 max-w-2xl mx-auto text-lg font-light leading-relaxed">
+                        نقدم لك نخبة الخدمات الراقية لتجعل من مناسبتك ذكرى لا تُنسى. تصفح مجموعتنا المختارة بعناية من أفضل المزودين في المملكة.
+                    </p>
+                </div>
 
-                    {/* Tech-Style Search Bar */}
-                    <div className="max-w-2xl mx-auto mt-12 relative animate-in zoom-in duration-500 delay-150">
-                        <div className="bg-white rounded-full shadow-2xl p-2 flex items-center border-4 border-[#EBE2FF] focus-within:border-[#D9FF5B] transition-colors">
-                            <Search className="text-[#0D0032] mr-4 ml-2" size={24} />
+                {/* Search & Filter Section */}
+                <div className="sticky top-4 z-20 bg-[#050505]/80 backdrop-blur-xl border border-white/10 p-4 rounded-2xl shadow-2xl mb-16">
+                    <div className="flex flex-col md:flex-row gap-6 items-center justify-between">
+
+                        {/* Search Bar */}
+                        <div className="relative w-full md:w-96 group">
+                            <Search className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#D4AF37] transition duration-300" size={20} />
                             <input
                                 type="text"
-                                placeholder="ابحث عن قاعات، خدمات، أو تقنيات..."
+                                placeholder="ابحث عن خدمة، موقع..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="flex-1 bg-transparent border-none outline-none text-[#0D0032] placeholder-gray-400 h-12 px-2 font-medium"
+                                className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pr-12 pl-4 text-white placeholder-gray-500 focus:outline-none focus:border-[#D4AF37]/50 focus:bg-white/10 transition-all duration-300"
                             />
-                            <button className="bg-[#D9FF5B] text-[#0D0032] px-8 py-3 rounded-full font-bold hover:bg-[#c9f046] transition-colors shadow-lg shadow-[#D9FF5B]/20">
-                                ابحث الآن
-                            </button>
+                        </div>
+
+                        {/* Categories */}
+                        <div className="flex gap-2 overflow-x-auto pb-2 md:pb-0 w-full md:w-auto px-2 scrollbar-hide">
+                            {CATEGORIES.map((cat) => (
+                                <button
+                                    key={cat}
+                                    onClick={() => setActiveCategory(cat)}
+                                    className={`px-6 py-2.5 rounded-xl text-sm font-medium transition-all duration-300 whitespace-nowrap backdrop-blur-md border ${activeCategory === cat
+                                        ? 'bg-[#D4AF37]/20 border-[#D4AF37] text-[#D4AF37] shadow-[0_0_15px_rgba(212,175,55,0.3)]'
+                                        : 'bg-white/5 border-white/10 text-gray-300 hover:bg-white/10 hover:border-white/20 hover:text-white'
+                                        }`}
+                                >
+                                    {cat}
+                                </button>
+                            ))}
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <div className="max-w-7xl mx-auto px-4 py-16">
-                {/* Tech Pill Filters */}
-                <div className="mb-12 overflow-x-auto pb-4 scrollbar-hide">
-                    <div className="flex justify-center gap-3">
-                        <button
-                            onClick={() => setSelectedCategory('all')}
-                            className={`px-6 py-3 rounded-full font-bold transition-all duration-300 border-2 ${selectedCategory === 'all'
-                                ? 'bg-[#0D0032] text-white border-[#0D0032] shadow-xl'
-                                : 'bg-white text-[#0D0032] border-[#EBE2FF] hover:border-[#D9FF5B]'
-                                }`}
-                        >
-                            الكل
-                        </button>
-                        {Object.entries(categoryLabels).map(([key, label]) => (
-                            <button
-                                key={key}
-                                onClick={() => setSelectedCategory(key)}
-                                className={`px-6 py-3 rounded-full font-bold transition-all duration-300 border-2 whitespace-nowrap ${selectedCategory === key
-                                    ? 'bg-[#0D0032] text-white border-[#0D0032] shadow-xl'
-                                    : 'bg-white text-[#0D0032] border-[#EBE2FF] hover:border-[#D9FF5B]'
-                                    }`}
-                            >
-                                {label}
-                            </button>
-                        ))}
-                    </div>
+                {/* Services Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {filteredServices.map((service) => (
+                        <div key={service.id} className="group relative bg-white/5 border border-white/10 rounded-2xl overflow-hidden hover:border-[#D4AF37]/30 transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl">
+
+                            {/* Image Container */}
+                            <div className="relative h-64 overflow-hidden">
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent z-10"></div>
+                                <img
+                                    src={service.image}
+                                    alt={service.title}
+                                    className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
+                                />
+
+                                {/* Price Tag */}
+                                <div className="absolute bottom-4 right-4 z-20 flex flex-col items-end">
+                                    <span className="text-xs text-gray-300 mb-1">يبدأ من</span>
+                                    <span className="text-xl font-bold text-[#D4AF37] font-serif">{service.price} <span className="text-xs font-sans text-white">ر.س</span></span>
+                                </div>
+
+                                {/* Category Badge */}
+                                <span className="absolute top-4 right-4 z-20 bg-black/50 backdrop-blur-md border border-white/10 px-3 py-1 rounded-full text-xs text-white">
+                                    {service.category}
+                                </span>
+                            </div>
+
+                            {/* Content */}
+                            <div className="p-6">
+                                <div className="flex justify-between items-start mb-4">
+                                    <div>
+                                        <h3 className="text-xl font-bold text-white mb-2 group-hover:text-[#D4AF37] transition-colors">{service.title}</h3>
+                                        <div className="flex items-center text-gray-400 text-sm gap-2">
+                                            <MapPin size={14} className="text-[#D4AF37]" />
+                                            {service.location}
+                                        </div>
+                                    </div>
+                                    {service.verified && (
+                                        <div className="bg-[#D4AF37]/10 p-1.5 rounded-full" title="Verified">
+                                            <Star size={16} className="text-[#D4AF37] fill-[#D4AF37]" />
+                                        </div>
+                                    )}
+                                </div>
+
+                                <div className="flex items-center justify-between border-t border-white/10 pt-4 mt-4">
+                                    <div className="flex items-center gap-1">
+                                        <Star size={14} className="text-yellow-500 fill-yellow-500" />
+                                        <span className="font-bold text-white">{service.rating}</span>
+                                        <span className="text-xs text-gray-500">(120 تقييم)</span>
+                                    </div>
+
+                                    <Link href={`/services/${service.id}`} className="flex items-center gap-2 text-sm text-gray-300 hover:text-white transition-colors group/link">
+                                        تفاصيل
+                                        <ArrowRight size={16} className="transform group-hover/link:-translate-x-1 transition-transform" />
+                                    </Link>
+                                </div>
+                            </div>
+                        </div>
+                    ))}
                 </div>
 
-                {/* Refined Grid */}
-                {filteredServices.length === 0 ? (
-                    <div className="text-center py-24 bg-white rounded-[2.5rem] border border-gray-100 shadow-sm">
-                        <div className="w-20 h-20 bg-[#EBE2FF] rounded-full flex items-center justify-center mx-auto mb-6">
-                            <Search className="text-[#0D0032]" size={32} />
+                {filteredServices.length === 0 && (
+                    <div className="text-center py-20">
+                        <div className="inline-block p-6 rounded-full bg-white/5 mb-4">
+                            <Filter size={32} className="text-gray-500" />
                         </div>
-                        <h3 className="text-2xl font-bold text-[#0D0032] mb-2">عذراً، لم نجد نتائج</h3>
-                        <p className="text-gray-500">حاول البحث بكلمات مختلفة أو تصفح فئات أخرى</p>
-                    </div>
-                ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {filteredServices.map((service, index) => (
-                            <Link
-                                key={service.id}
-                                href={`/services/${service.id}`}
-                                className="group bg-white rounded-[2.5rem] overflow-hidden border border-[#EBE2FF] hover:border-[#D9FF5B] transition-all duration-300 hover:shadow-xl hover:-translate-y-1 block animate-in fade-in slide-in-from-bottom-8 fill-mode-backwards"
-                                style={{ animationDelay: `${index * 100}ms` }}
-                            >
-                                {/* Card Image Area */}
-                                <div className="h-64 relative overflow-hidden bg-[#EBE2FF]">
-                                    <div className={`absolute inset-0 bg-gradient-to-tr transition-opacity duration-500 ${service.is_external ? 'from-blue-900/40 to-transparent' : 'from-[#0D0032]/40 to-transparent'} opacity-0 group-hover:opacity-100`}></div>
-
-                                    {/* Placeholder Gradient if no image (real app would use Image) */}
-                                    <div className="w-full h-full bg-gradient-to-br from-[#f8f9fa] to-[#e9ecef] group-hover:scale-105 transition-transform duration-700"></div>
-
-                                    {/* Badges */}
-                                    <div className="absolute top-4 right-4 flex gap-2">
-                                        <span className="bg-white text-[#0D0032] px-4 py-1.5 rounded-full text-xs font-bold shadow-md">
-                                            {categoryLabels[service.category]}
-                                        </span>
-                                        {service.is_external && (
-                                            <span className="bg-[#4285F4] text-white px-3 py-1.5 rounded-full text-xs font-bold shadow-md flex items-center gap-1">
-                                                <MapPin size={10} /> Google Maps
-                                            </span>
-                                        )}
-                                    </div>
-                                </div>
-
-                                {/* Card Content */}
-                                <div className="p-8 relative">
-                                    <h3 className="text-2xl font-bold text-[#0D0032] mb-3 line-clamp-1 group-hover:text-[#4a148c] transition-colors">
-                                        {service.title}
-                                    </h3>
-
-                                    <div className="flex items-center gap-2 mb-6 text-[#666666] text-sm font-medium">
-                                        <MapPin size={16} className="text-[#D9FF5B]" />
-                                        <span>{service.location}</span>
-                                    </div>
-
-                                    <div className="flex items-center justify-between border-t border-[#f0f0f0] pt-6 mt-2">
-                                        <div className="flex items-center gap-1 bg-[#f8f9fa] px-3 py-1 rounded-full">
-                                            {service.average_rating > 0 ? (
-                                                <>
-                                                    <Star size={14} className="text-[#0D0032] fill-[#0D0032]" />
-                                                    <span className="font-bold text-[#0D0032]">{service.average_rating.toFixed(1)}</span>
-                                                    <span className="text-xs text-gray-500">({service.total_reviews})</span>
-                                                </>
-                                            ) : (
-                                                <span className="text-xs text-gray-400">جديد</span>
-                                            )}
-                                        </div>
-
-                                        <div className="text-left">
-                                            <p className="text-[#0D0032] font-black text-xl">
-                                                {typeof service.base_price === 'number' ? (
-                                                    <>{service.base_price.toLocaleString()} <span className="text-xs font-medium text-gray-500">ريال</span></>
-                                                ) : (
-                                                    <span className="text-sm font-bold">{service.base_price}</span>
-                                                )}
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </Link>
-                        ))}
+                        <h3 className="text-xl font-bold text-white mb-2">لا توجد نتائج</h3>
+                        <p className="text-gray-400">حاول تغيير خيارات البحث أو الفلتر</p>
                     </div>
                 )}
-            </div>
 
-            {/* Tech CTA */}
-            <div className="bg-[#EBE2FF] py-24 text-center rounded-t-[3rem] mx-4 mt-8">
-                <div className="max-w-3xl mx-auto px-4">
-                    <h2 className="text-4xl font-extrabold text-[#0D0032] mb-6">جاهز لإطلاق فعاليتك؟</h2>
-                    <p className="text-[#0D0032]/70 mb-10 text-lg font-medium">
-                        انضم إلى منصة النخبة وواكب مستقبل إدارة الفعاليات
-                    </p>
-                    <Link href="/dashboard/services" className="inline-block bg-[#0D0032] text-white px-12 py-4 rounded-full hover:bg-[#1a0536] transition-all duration-300 shadow-xl text-lg font-bold">
-                        ابدأ الآن مجاناً
-                    </Link>
-                </div>
             </div>
         </div>
     );

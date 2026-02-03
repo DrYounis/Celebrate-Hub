@@ -2,312 +2,171 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
-import { supabase } from '@/lib/supabaseClient' // Adjust path as needed
-import PointsBadge from '@/components/PointsBadge'
+import { supabase } from '@/lib/supabaseClient'
 import Link from 'next/link'
+import { TrendingUp, Lightbulb, User, Clock, CheckCircle, Lock } from 'lucide-react'
 
-// Placeholder components - in a real app these would be separate files
-const ClientDashboard = ({ profile }: { profile: any }) => {
-    const [requests, setRequests] = useState<any[]>([])
-    const [bookings, setBookings] = useState<any[]>([])
+// --- Components for New Roles ---
 
-    useEffect(() => {
-        const fetchRequests = async () => {
-            const { data } = await supabase
-                .from('event_requests')
-                .select(`*, contractor:contractor_id(business_name)`)
-                .eq('client_id', profile.id)
-                .order('created_at', { ascending: false })
-
-            if (data) setRequests(data)
-        }
-
-        const fetchBookings = async () => {
-            const { data } = await supabase
-                .from('bookings')
-                .select(`
-                    *,
-                    service:service_id(title, category),
-                    provider:provider_id(business_name, full_name)
-                `)
-                .eq('customer_id', profile.id)
-                .order('created_at', { ascending: false })
-
-            if (data) setBookings(data)
-        }
-
-        fetchRequests()
-        fetchBookings()
-    }, [profile.id])
-
-    // Progress logic (example)
-    const nextLevelPoints = 500
-    const progressPercent = Math.min((profile.total_points / nextLevelPoints) * 100, 100)
-
+const InvestorDashboard = ({ profile }: { profile: any }) => {
     return (
-        <div className="max-w-6xl mx-auto p-4 md:p-6" dir="rtl">
-            {/* Gamification Header */}
-            <div className="bg-gradient-to-l from-indigo-600 to-purple-700 rounded-3xl p-6 md:p-8 text-white shadow-xl mb-10 relative overflow-hidden">
-                <div className="absolute top-0 right-0 p-4 opacity-10 text-9xl">🏆</div>
-                <div className="flex flex-col md:flex-row justify-between items-center relative z-10">
-                    <div className="text-center md:text-right mb-6 md:mb-0">
-                        <h1 className="text-3xl font-bold mb-2">أهلاً، {profile.full_name}! 👋</h1>
-                        <p className="opacity-90 text-indigo-100 font-medium">مستواك الحالي: رائد أعمال فضي 🥈</p>
+        <div className="max-w-5xl mx-auto p-6 space-y-8" dir="rtl">
+            {/* Header */}
+            <div className="bg-[#0D0032] text-white rounded-3xl p-8 shadow-xl relative overflow-hidden">
+                <div className="relative z-10 flex justify-between items-center">
+                    <div>
+                        <h1 className="text-3xl font-bold mb-2">مرحباً، {profile.full_name} 👋</h1>
+                        <p className="text-gray-300">لوحة تحكم المستثمر</p>
                     </div>
-                    <div className="text-center">
-                        <span className="text-5xl font-black tracking-tight">{profile.total_points || 0}</span>
-                        <span className="block text-sm opacity-80 mt-1">نقطة XP مجتمعة</span>
+                    <div className="bg-white/10 p-3 rounded-full backdrop-blur-sm">
+                        <TrendingUp size={32} className="text-[#D9FF5B]" />
                     </div>
                 </div>
-
-                {/* Progress Bar */}
-                <div className="mt-8 relative z-10">
-                    <div className="flex justify-between text-xs mb-2 font-semibold tracking-wide opacity-90">
-                        <span>المستوى القادم: رائد أعمال ذهبي 🥇</span>
-                        <span>{Math.round(progressPercent)}%</span>
-                    </div>
-                    <div className="w-full bg-white/20 h-4 rounded-full backdrop-blur-sm overflow-hidden border border-white/10">
-                        <div
-                            className="bg-gradient-to-r from-yellow-300 to-yellow-500 h-4 rounded-full shadow-[0_0_10px_rgba(255,255,255,0.5)] transition-all duration-1000 ease-out"
-                            style={{ width: `${progressPercent}%` }}
-                        ></div>
-                    </div>
-                    <p className="text-xs mt-2 text-center text-indigo-200">باقي {nextLevelPoints - (profile.total_points || 0)} نقطة للوصول للمستوى التالي!</p>
-                </div>
+                {/* Background Pattern */}
+                <div className="absolute top-0 left-0 w-full h-full opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                {/* Request History */}
-                <div className="lg:col-span-2 space-y-6">
-                    <div className="flex justify-between items-center">
-                        <h2 className="text-xl font-bold text-gray-800">تاريخ طلباتك 📁</h2>
-                        <Link href="/comparison" className="text-indigo-600 text-sm font-bold hover:underline">
-                            + طلب جديد
+            {/* Approval Status */}
+            {!profile.is_approved ? (
+                <div className="bg-yellow-50 border-r-4 border-yellow-400 p-6 rounded-xl flex items-start gap-4 shadow-sm">
+                    <Clock className="text-yellow-600 shrink-0 mt-1" size={24} />
+                    <div>
+                        <h3 className="text-lg font-bold text-gray-800 mb-1">حسابك قيد المراجعة</h3>
+                        <p className="text-gray-600">شكراً لانضمامك! يقوم فريقنا حالياً بمراجعة طلبك للتحقق من أهليتك كمستثمر. سنقوم بتفعيل حسابك قريباً.</p>
+                    </div>
+                </div>
+            ) : (
+                <div className="grid md:grid-cols-2 gap-6">
+                    <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                        <h3 className="text-xl font-bold text-[#0D0032] mb-4">الفرص الاستثمارية 🚀</h3>
+                        <p className="text-gray-500 text-sm mb-4">تصفح الشركات الناشئة الواعدة من خريجي أكاديمية مرفأ.</p>
+                        <button className="w-full bg-[#0D0032] text-white py-3 rounded-xl font-bold hover:bg-[#1a0b4b] transition">
+                            استعراض الشركات
+                        </button>
+                    </div>
+                    <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                        <h3 className="text-xl font-bold text-[#0D0032] mb-4">رسائل رواد الأعمال 💬</h3>
+                        <Link href="/admin/inbox">
+                            <div className="flex items-center justify-between bg-gray-50 p-4 rounded-xl hover:bg-gray-100 transition cursor-pointer">
+                                <span>صندوق الوارد</span>
+                                <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full">3 جديدة</span>
+                            </div>
                         </Link>
                     </div>
-
-                    {requests.length === 0 ? (
-                        <div className="bg-white p-8 rounded-xl border-2 border-dashed border-gray-200 text-center text-gray-500">
-                            <p className="mb-4">ليس لديك طلبات سابقة.</p>
-                            <Link href="/comparison" className="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition inline-block">
-                                ابحث عن مقاول الآن
-                            </Link>
-                        </div>
-                    ) : (
-                        <div className="space-y-4">
-                            {requests.map(req => (
-                                <div key={req.id} className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow flex flex-col sm:flex-row justify-between items-center gap-4">
-                                    <div className="text-center sm:text-right">
-                                        <h4 className="font-bold text-gray-900 text-lg">{req.event_name}</h4>
-                                        <p className="text-sm text-gray-500 flex items-center justify-center sm:justify-start gap-1">
-                                            <span>👤</span> {req.contractor?.business_name || 'مقدم خدمة'}
-                                        </p>
-                                    </div>
-                                    <div className="flex flex-col items-center gap-2">
-                                        <Link
-                                            href={`/chat/${req.id}`}
-                                            className="text-xs text-indigo-600 font-bold hover:underline mb-1"
-                                        >
-                                            💬 محادثة
-                                        </Link>
-                                        <span className={`px-4 py-1.5 rounded-full text-xs font-bold ${req.status === 'completed' ? 'bg-green-100 text-green-700' :
-                                            req.status === 'accepted' ? 'bg-blue-100 text-blue-700' :
-                                                req.status === 'rejected' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700'
-                                            }`}>
-                                            {req.status === 'pending' ? '⏳ قيد المراجعة' :
-                                                req.status === 'accepted' ? '✅ مقبول' :
-                                                    req.status === 'completed' ? '🎉 مكتمل' : '❌ مرفوض'}
-                                        </span>
-                                        {/* Show Review Button if completed */}
-                                        {/* {req.status === 'completed' && <button className="text-xs text-yellow-600 underline font-bold">تقييم الخدمة</button>} */}
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    )}
                 </div>
-
-                {/* Rewards Store (Locked/Unlocked) */}
-                <div className="bg-gradient-to-br from-gray-50 to-gray-100 p-6 rounded-2xl border border-gray-200 h-fit">
-                    <h2 className="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
-                        <span>🎁</span> مكافآت الولاء
-                    </h2>
-                    <div className="space-y-4">
-                        <div className={`p-4 rounded-xl border-2 flex items-center gap-4 transition-all ${(profile.total_points || 0) >= 500 ? 'bg-white border-green-400 shadow-sm' : 'bg-gray-100/50 border-gray-200 opacity-60'
-                            }`}>
-                            <div className="text-3xl bg-gray-50 p-2 rounded-lg">🚚</div>
-                            <div>
-                                <p className="font-bold text-gray-800">خصم 10% على اللوجستيك</p>
-                                {(profile.total_points || 0) >= 500 ? (
-                                    <p className="text-xs text-green-600 font-bold mt-1">✅ تم فك القفل! استخدم الكود: LOGIST10</p>
-                                ) : (
-                                    <p className="text-xs text-gray-500 mt-1">🔒 تحتاج 500 نقطة</p>
-                                )}
-                            </div>
-                        </div>
-
-                        <div className={`p-4 rounded-xl border-2 flex items-center gap-4 transition-all ${(profile.total_points || 0) >= 1000 ? 'bg-white border-yellow-400 shadow-sm' : 'bg-gray-100/50 border-gray-200 opacity-60'
-                            }`}>
-                            <div className="text-3xl bg-gray-50 p-2 rounded-lg">🌟</div>
-                            <div>
-                                <p className="font-bold text-gray-800">استشارة تقنية مجانية</p>
-                                {(profile.total_points || 0) >= 1000 ? (
-                                    <p className="text-xs text-green-600 font-bold mt-1">✅ تم فك القفل!</p>
-                                ) : (
-                                    <p className="text-xs text-gray-500 mt-1">🔒 تحتاج 1000 نقطة</p>
-                                )}
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="mt-8 bg-indigo-50 p-4 rounded-xl text-center">
-                        <p className="text-indigo-800 text-sm font-medium">💡 نصيحة: اترك تقييماً بعد اكتمال الخدمة لتحصل على +15 نقطة فوراً!</p>
-                    </div>
-                </div>
-            </div>
+            )}
         </div>
     )
 }
 
-const ContractorDashboard = ({ profile }: { profile: any }) => {
-    const [requests, setRequests] = useState<any[]>([])
-
-    useEffect(() => {
-        // 1. Initial Fetch
-        const fetchRequests = async () => {
-            const { data } = await supabase
-                .from('event_requests')
-                .select(`*, client:client_id(full_name, avatar_url)`)
-                .eq('contractor_id', profile.id)
-                .order('created_at', { ascending: false })
-
-            if (data) setRequests(data)
-        }
-        fetchRequests()
-
-        // 2. Real-time Subscription
-        const subscription = supabase
-            .channel('contractor-requests')
-            .on(
-                'postgres_changes',
-                { event: 'INSERT', schema: 'public', table: 'event_requests', filter: `contractor_id=eq.${profile.id}` },
-                (payload) => {
-                    // On new request, append to list (or re-fetch for simplicity/joins)
-                    fetchRequests()
-                    // Optional: Trigger browser notification here
-                    // new Notification('طلب جديد!')
-                }
-            )
-            .subscribe()
-
-        return () => { supabase.removeChannel(subscription) }
-    }, [profile.id])
-
-    const handleStatus = async (requestId: string, newStatus: string) => {
-        const { error } = await supabase
-            .from('event_requests')
-            .update({ status: newStatus })
-            .eq('id', requestId);
-
-        if (!error) {
-            // Optimistic update
-            setRequests(prev => prev.map(r => r.id === requestId ? { ...r, status: newStatus } : r))
-            // Alert/Notify
-            // alert(`تمت العملية بنجاح: ${newStatus}`) 
-            // In a real app, use a toast library instead of alert
-        } else {
-            console.error('Error updating status:', error)
-        }
-    };
-
+const EntrepreneurDashboard = ({ profile }: { profile: any }) => {
     return (
-        <div className="space-y-6">
-            <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex justify-between items-center">
-                <div>
-                    <h2 className="text-2xl font-bold text-gray-800">{profile.business_name || 'لوحة التحكم'}</h2>
-                    <p className="text-gray-500">لديك {requests.filter(r => r.status === 'pending').length} طلبات بانتظار المراجعة</p>
-                </div>
-                <div className="text-purple-600 font-bold bg-purple-50 px-4 py-2 rounded-full">
-                    {profile.category || 'مورد'}
+        <div className="max-w-5xl mx-auto p-6 space-y-8" dir="rtl">
+            {/* Header */}
+            <div className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-3xl p-8 shadow-xl relative overflow-hidden">
+                <div className="relative z-10 flex justify-between items-center">
+                    <div>
+                        <h1 className="text-3xl font-bold mb-2">أهلاً، {profile.full_name} 🚀</h1>
+                        <p className="text-emerald-100 font-medium">عضو أكاديمية مرفأ</p>
+                    </div>
+                    <div className="bg-white/20 p-3 rounded-full backdrop-blur-sm shadow-lg">
+                        <Lightbulb size={32} className="text-white" />
+                    </div>
                 </div>
             </div>
 
-            <div className="grid gap-4">
-                {requests.map((request) => (
-                    <div key={request.id} className="bg-white p-5 rounded-xl shadow-sm border-r-4 border-indigo-500 flex flex-col md:flex-row justify-between items-center gap-4">
-                        <div className="text-right">
-                            <h3 className="font-bold text-lg text-gray-800">{request.event_name}</h3>
-                            <p className="text-sm text-gray-600">من: {request.client?.full_name}</p>
-                            <div className="flex flex-wrap gap-4 mt-2 text-xs text-gray-400">
-                                <span>📅 {request.event_date}</span>
-                                <span>💰 ميزانية: {request.budget_range}</span>
-                            </div>
+            {/* Academy Progress */}
+            <div className="grid md:grid-cols-3 gap-6">
+                <div className="md:col-span-2 space-y-6">
+                    {/* Enrollment Status */}
+                    <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                        <h3 className="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+                            <span className="bg-blue-100 text-blue-600 p-1.5 rounded-lg"><CheckCircle size={20} /></span>
+                            حالة التسجيل
+                        </h3>
+
+                        <div className="flex items-center justify-between bg-gray-50 p-4 rounded-xl border border-gray-200">
+                            <span className="text-gray-600 font-medium">البرنامج الحالي</span>
+                            <span className="font-bold text-[#0D0032]">الدفعة الثالثة - مسار المناسبات</span>
                         </div>
-
-                        <div className="flex gap-2 w-full md:w-auto items-center">
-                            {/* Chat Button */}
-                            <Link
-                                href={`/chat/${request.id}`}
-                                className="bg-indigo-50 text-indigo-600 p-3 rounded-lg hover:bg-indigo-100 transition"
-                                title="محادثة"
-                            >
-                                💬
-                            </Link>
-
-                            {request.status === 'pending' ? (
-                                <>
-                                    <button
-                                        onClick={() => handleStatus(request.id, 'accepted')}
-                                        className="flex-1 md:flex-none bg-green-100 text-green-700 px-6 py-2 rounded-lg hover:bg-green-200 font-medium transition"
-                                    >
-                                        قبول
-                                    </button>
-                                    <button
-                                        onClick={() => handleStatus(request.id, 'rejected')}
-                                        className="flex-1 md:flex-none bg-red-100 text-red-700 px-6 py-2 rounded-lg hover:bg-red-200 font-medium transition"
-                                    >
-                                        رفض
-                                    </button>
-                                </>
-                            ) : (
-                                <span className={`px-4 py-2 rounded-lg font-bold text-sm ${request.status === 'accepted' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'
-                                    }`}>
-                                    {request.status === 'accepted' ? 'مقبول ✅' : 'مرفوض ❌'}
-                                </span>
-                            )}
+                        <div className="flex items-center justify-between bg-gray-50 p-4 rounded-xl border border-gray-200 mt-3">
+                            <span className="text-gray-600 font-medium">الحالة</span>
+                            <span className={`px-3 py-1 rounded-full text-xs font-bold ${profile.is_marfa_enrolled ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
+                                {profile.is_marfa_enrolled ? 'ملتحق ✅' : 'قيد التسجيل'}
+                            </span>
                         </div>
                     </div>
-                ))}
-                {requests.length === 0 && (
-                    <div className="text-center py-10 text-gray-500 bg-white rounded-xl">
-                        لا توجد طلبات واردة حالياً
+
+                    {/* Next Steps */}
+                    <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                        <h3 className="text-xl font-bold text-gray-800 mb-4">الخطوات القادمة</h3>
+                        <ul className="space-y-4">
+                            <li className="flex items-center gap-3 text-gray-600 opacity-50">
+                                <CheckCircle size={20} className="text-green-500" />
+                                <span className="line-through">تسجيل البيانات الأولية</span>
+                            </li>
+                            <li className="flex items-center gap-3 text-gray-800 font-medium bg-blue-50 p-3 rounded-lg border border-blue-100">
+                                <div className="w-5 h-5 rounded-full border-2 border-blue-500 grid place-items-center">
+                                    <div className="w-2.5 h-2.5 bg-blue-500 rounded-full"></div>
+                                </div>
+                                <span>استكمال دراسة الجدوى الأولية</span>
+                            </li>
+                            <li className="flex items-center gap-3 text-gray-400">
+                                <div className="w-5 h-5 rounded-full border-2 border-gray-300"></div>
+                                <span>المقابلة الشخصية</span>
+                            </li>
+                        </ul>
                     </div>
-                )}
+                </div>
+
+                {/* Sidebar */}
+                <div className="space-y-6">
+                    <div className="bg-[#F8F9FA] p-6 rounded-2xl border border-gray-200">
+                        <h4 className="font-bold text-gray-800 mb-4">أدوات مساعدة</h4>
+                        <div className="space-y-3">
+                            <button className="w-full flex items-center justify-between bg-white p-3 rounded-xl border border-gray-200 text-gray-600 hover:border-emerald-400 hover:text-emerald-600 transition">
+                                <span>📝 نموذج العمل التجاري</span>
+                                <Lock size={16} className="text-gray-400" />
+                            </button>
+                            <button className="w-full flex items-center justify-between bg-white p-3 rounded-xl border border-gray-200 text-gray-600 hover:border-emerald-400 hover:text-emerald-600 transition">
+                                <span>📊 حاسبة السوق</span>
+                                <Lock size={16} className="text-gray-400" />
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     )
 }
 
-export const dynamic = 'force-dynamic'
+// --- Main Page Component ---
 
 export default function DashboardPage() {
     const [profile, setProfile] = useState<any>(null)
+    const [role, setRole] = useState<'investor' | 'entrepreneur' | null>(null)
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
         const checkUser = async () => {
-            // Mock user fetch - in real app use auth context
-            // For demo purposes, we will fetch a 'pro' user if available, or just any user
-            // Or you can create a temporary logic to toggle for demo
-
             const { data: { user } } = await supabase.auth.getUser()
 
             if (user) {
-                const { data } = await supabase.from('profiles').select('*').eq('id', user.id).single()
-                setProfile(data)
-            } else {
-                // Fallback for demo if no user logged in
-                // setProfile({ role: 'free', full_name: 'ضيف', total_points: 120 })
+                // Check if Investor
+                const { data: investorData } = await supabase.from('investors').select('*').eq('id', user.id).maybeSingle();
+                if (investorData) {
+                    setProfile(investorData);
+                    setRole('investor');
+                    setLoading(false);
+                    return;
+                }
+
+                // Check if Entrepreneur
+                const { data: entData } = await supabase.from('entrepreneurs').select('*').eq('id', user.id).maybeSingle();
+                if (entData) {
+                    setProfile(entData);
+                    setRole('entrepreneur');
+                }
             }
             setLoading(false)
         }
@@ -315,26 +174,39 @@ export default function DashboardPage() {
         checkUser()
     }, [])
 
-    if (loading) return <div className="p-12 text-center">جاري التحميل...</div>
+    if (loading) return (
+        <div className="min-h-screen grid place-items-center bg-gray-50">
+            <div className="animate-spin text-indigo-600">
+                <svg className="w-10 h-10" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+            </div>
+        </div>
+    )
 
     if (!profile) {
         return (
-            <div className="p-12 text-center">
-                <h2 className="text-xl mb-4">يرجى تسجيل الدخول للوصول إلى لوحة التحكم</h2>
-                <Link href="/login" className="text-indigo-600 underline">تسجيل الدخول</Link>
+            <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
+                <div className="bg-white p-8 rounded-2xl shadow-lg max-w-md w-full text-center">
+                    <User size={48} className="mx-auto text-gray-400 mb-4" />
+                    <h2 className="text-xl font-bold text-gray-800 mb-2">يرجى تسجيل الدخول</h2>
+                    <p className="text-gray-500 mb-6">قم بتسجيل الدخول للوصول إلى لوحة التحكم الخاصة بك.</p>
+                    <button onClick={() => window.location.reload()} className="bg-indigo-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-indigo-700 transition w-full">
+                        تسجيل الدخول / تحديث
+                    </button>
+                </div>
             </div>
         )
     }
 
     return (
         <div className="min-h-screen bg-gray-50 py-12 px-4" dir="rtl">
-            <div className="max-w-5xl mx-auto">
-                {profile.role === 'pro' ? (
-                    <ContractorDashboard profile={profile} />
-                ) : (
-                    <ClientDashboard profile={profile} />
-                )}
-            </div>
+            {role === 'investor' ? (
+                <InvestorDashboard profile={profile} />
+            ) : (
+                <EntrepreneurDashboard profile={profile} />
+            )}
         </div>
     )
 }
