@@ -29,10 +29,6 @@ export const Hero = () => {
                     <Button size="default" style={{ padding: '1rem 2rem', fontSize: '1.1rem' }}>
                         ابدأ التخطيط الآن <ArrowLeft size={20} />
                     </Button>
-
-                    <Button variant="outline" style={{ color: '#fff', borderColor: 'rgba(255,255,255,0.3)' }}>
-                        شاهد الفيديو التعريفي <PlayCircle size={20} />
-                    </Button>
                 </div>
 
                 {/* Stats */}
