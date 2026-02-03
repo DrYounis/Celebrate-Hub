@@ -50,7 +50,7 @@ const services = [
 
 export default function PlannersPage() {
     return (
-        <div className="min-h-screen bg-[#fcfaf7]" dir="rtl">
+        <div className="min-h-screen bg-[#fdfdfd]" dir="rtl">
             <Header />
 
             {/* Hero Section */}

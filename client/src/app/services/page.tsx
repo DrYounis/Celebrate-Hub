@@ -98,7 +98,7 @@ export default function ServicesPage() {
     }
 
     return (
-        <div className="min-h-screen bg-[#fcfaf7]" dir="rtl">
+        <div className="min-h-screen bg-[#fdfdfd]" dir="rtl">
             <Header />
 
             {/* Luxurious Hero Section */}
