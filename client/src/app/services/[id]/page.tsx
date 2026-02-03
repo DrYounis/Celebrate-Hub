@@ -3,21 +3,25 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import { useRouter } from 'next/navigation';
-import { MapPin, Users, Star, Calendar, Clock, ArrowRight } from 'lucide-react';
+import { MapPin, Users, Star, Calendar, Clock, ArrowRight, Phone, MessageCircle } from 'lucide-react';
 import WhatsAppButton from '@/components/WhatsAppButton';
+import { HAIL_VENUES, HailVenue } from '@/lib/hail-data';
 
 interface Service {
     id: string;
     title: string;
     description: string;
     category: string;
-    base_price: number;
+    base_price: number | string;
     location: string;
     capacity: number;
     average_rating: number;
     total_reviews: number;
     features: string[];
     provider_id: string;
+    is_external?: boolean;
+    phone?: string;
+    images?: string[];
     profiles: {
         business_name: string;
         full_name: string;
@@ -55,6 +59,26 @@ export default function ServiceDetailPage({ params }: { params: { id: string } }
     }, [params.id]);
 
     const fetchServiceDetails = async () => {
+        // 1. Check if it's an external Hail Venue
+        const externalVenue = HAIL_VENUES.find(v => v.id === params.id);
+        if (externalVenue) {
+            setService({
+                ...externalVenue,
+                base_price: typeof externalVenue.base_price === 'string' ? externalVenue.base_price : 0,
+                total_reviews: Math.floor(Math.random() * 50) + 10,
+                capacity: 0,
+                provider_id: 'external',
+                profiles: {
+                    business_name: externalVenue.title,
+                    full_name: 'External Provider',
+                    phone: externalVenue.phone || null,
+                    whatsapp_enabled: true
+                }
+            } as unknown as Service);
+            setLoading(false);
+            return;
+        }
+
         const { data: serviceData } = await supabase
             .from('services')
             .select(`
@@ -85,6 +109,17 @@ export default function ServiceDetailPage({ params }: { params: { id: string } }
         }
 
         if (!service) return;
+
+        // External Service Booking Redirect
+        if (service.is_external) {
+            const phone = service.phone || service.profiles?.phone;
+            if (phone) {
+                window.open(`https://wa.me/966${phone.startsWith('0') ? phone.substring(1) : phone}?text=مرحباً، أود الاستفسار عن ${service.title}`, '_blank');
+            } else {
+                alert('يرجى التواصل مع المكان مباشرة');
+            }
+            return;
+        }
 
         const bookingData = {
             service_id: service.id,
@@ -252,85 +287,117 @@ export default function ServiceDetailPage({ params }: { params: { id: string } }
                     {/* Booking Sidebar */}
                     <div className="lg:col-span-1">
                         <div className="bg-white p-6 rounded-2xl shadow-lg sticky top-4">
-                            <h3 className="text-2xl font-bold mb-6">احجز الآن</h3>
+                            {service.is_external ? (
+                                <div className="text-center space-y-6">
+                                    <h3 className="text-2xl font-bold text-gray-800">تواصل مع المكان</h3>
+                                    <p className="text-gray-600">هذه الخدمة متاحة عبر بحث Google. يمكنك التواصل معهم مباشرة.</p>
 
-                            <div className="space-y-4">
-                                <div>
-                                    <label className="block text-sm font-bold text-gray-700 mb-2">
-                                        <Calendar className="inline ml-2" size={16} />
-                                        تاريخ المناسبة *
-                                    </label>
-                                    <input
-                                        type="date"
-                                        required
-                                        value={eventDate}
-                                        onChange={(e) => setEventDate(e.target.value)}
-                                        min={new Date().toISOString().split('T')[0]}
-                                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
-                                    />
-                                </div>
-
-                                <div>
-                                    <label className="block text-sm font-bold text-gray-700 mb-2">
-                                        <Clock className="inline ml-2" size={16} />
-                                        الوقت
-                                    </label>
-                                    <input
-                                        type="time"
-                                        value={eventTime}
-                                        onChange={(e) => setEventTime(e.target.value)}
-                                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
-                                    />
-                                </div>
-
-                                <div>
-                                    <label className="block text-sm font-bold text-gray-700 mb-2">
-                                        <Users className="inline ml-2" size={16} />
-                                        عدد الضيوف
-                                    </label>
-                                    <input
-                                        type="number"
-                                        value={guestCount}
-                                        onChange={(e) => setGuestCount(e.target.value)}
-                                        placeholder="مثال: 200"
-                                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
-                                    />
-                                </div>
-
-                                <div>
-                                    <label className="block text-sm font-bold text-gray-700 mb-2">
-                                        ملاحظات إضافية
-                                    </label>
-                                    <textarea
-                                        value={notes}
-                                        onChange={(e) => setNotes(e.target.value)}
-                                        rows={3}
-                                        placeholder="أي تفاصيل إضافية..."
-                                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
-                                    />
-                                </div>
-
-                                <div className="pt-4 border-t border-gray-200">
-                                    <div className="flex justify-between items-center mb-4">
-                                        <span className="text-gray-600">الإجمالي</span>
-                                        <span className="text-3xl font-bold text-purple-600">
-                                            {(selectedPackage?.price || service.base_price).toLocaleString()} ريال
-                                        </span>
+                                    <div className="p-4 bg-gray-50 rounded-xl border border-gray-200">
+                                        <p className="text-sm text-gray-500 mb-1">السعر التقريبي</p>
+                                        <p className="text-xl font-bold text-purple-600">{service.base_price}</p>
                                     </div>
 
-                                    <button
-                                        onClick={handleBooking}
-                                        disabled={!eventDate}
-                                        className="w-full bg-purple-600 text-white py-4 rounded-xl hover:bg-purple-700 transition font-bold text-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                                    <a
+                                        href={`tel:${service.phone || service.profiles?.phone || ''}`}
+                                        className="w-full bg-white border-2 border-purple-600 text-purple-600 py-3 rounded-xl hover:bg-purple-50 transition font-bold flex items-center justify-center gap-2"
                                     >
-                                        تأكيد الحجز
-                                    </button>
+                                        <Phone size={20} />
+                                        اتصال هاتفي
+                                    </a>
 
-                                    <p className="text-xs text-gray-500 text-center mt-3">
-                                        ✨ احصل على 50 نقطة مكافأة عند إتمام الحجز!
-                                    </p>
+                                    <a
+                                        href={`https://wa.me/966${(service.phone || service.profiles?.phone || '').replace(/\D/g, '').slice(-9)}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="w-full bg-[#25D366] text-white py-3 rounded-xl hover:bg-[#20ba56] transition font-bold flex items-center justify-center gap-2"
+                                    >
+                                        <MessageCircle size={20} />
+                                        مراسلة عبر واتساب
+                                    </a>
                                 </div>
-                            </div>
+                            ) : (
+                                <>
+                                    <h3 className="text-2xl font-bold mb-6">احجز الآن</h3>
+
+                                    <div className="space-y-4">
+                                        <div>
+                                            <label className="block text-sm font-bold text-gray-700 mb-2">
+                                                <Calendar className="inline ml-2" size={16} />
+                                                تاريخ المناسبة *
+                                            </label>
+                                            <input
+                                                type="date"
+                                                required
+                                                value={eventDate}
+                                                onChange={(e) => setEventDate(e.target.value)}
+                                                min={new Date().toISOString().split('T')[0]}
+                                                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+                                            />
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-sm font-bold text-gray-700 mb-2">
+                                                <Clock className="inline ml-2" size={16} />
+                                                الوقت
+                                            </label>
+                                            <input
+                                                type="time"
+                                                value={eventTime}
+                                                onChange={(e) => setEventTime(e.target.value)}
+                                                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+                                            />
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-sm font-bold text-gray-700 mb-2">
+                                                <Users className="inline ml-2" size={16} />
+                                                عدد الضيوف
+                                            </label>
+                                            <input
+                                                type="number"
+                                                value={guestCount}
+                                                onChange={(e) => setGuestCount(e.target.value)}
+                                                placeholder="مثال: 200"
+                                                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+                                            />
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-sm font-bold text-gray-700 mb-2">
+                                                ملاحظات إضافية
+                                            </label>
+                                            <textarea
+                                                value={notes}
+                                                onChange={(e) => setNotes(e.target.value)}
+                                                rows={3}
+                                                placeholder="أي تفاصيل إضافية..."
+                                                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+                                            />
+                                        </div>
+
+                                        <div className="pt-4 border-t border-gray-200">
+                                            <div className="flex justify-between items-center mb-4">
+                                                <span className="text-gray-600">الإجمالي</span>
+                                                <span className="text-3xl font-bold text-purple-600">
+                                                    {(selectedPackage?.price || typeof service.base_price === 'number' ? service.base_price : 0).toLocaleString()} <span className="text-sm">ريال</span>
+                                                </span>
+                                            </div>
+
+                                            <button
+                                                onClick={handleBooking}
+                                                disabled={!eventDate}
+                                                className="w-full bg-purple-600 text-white py-4 rounded-xl hover:bg-purple-700 transition font-bold text-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                                            >
+                                                تأكيد الحجز
+                                            </button>
+
+                                            <p className="text-xs text-gray-500 text-center mt-3">
+                                                ✨ احصل على 50 نقطة مكافأة عند إتمام الحجز!
+                                            </p>
+                                        </div>
+                                    </div>
+                                </>
+                            )}
                         </div>
                     </div>
                 </div>

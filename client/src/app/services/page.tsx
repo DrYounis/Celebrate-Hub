@@ -12,12 +12,13 @@ interface Service {
     title: string;
     description: string;
     category: string;
-    base_price: number;
+    base_price: number | string;
     location: string;
     capacity: number;
     average_rating: number;
     total_reviews: number;
     provider_id: string;
+    is_external?: boolean;
     profiles: {
         business_name: string;
     };
@@ -198,6 +199,11 @@ export default function ServicesPage() {
                                             <span className="text-gray-500 text-sm">({service.total_reviews})</span>
                                         </div>
                                     )}
+                                    {service.is_external && (
+                                        <div className="absolute bottom-4 right-4 bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-bold border border-blue-200 shadow-sm">
+                                            Google Maps
+                                        </div>
+                                    )}
                                 </div>
 
                                 <div className="p-6">
@@ -225,7 +231,11 @@ export default function ServicesPage() {
                                         <div>
                                             <span className="text-sm text-gray-500">يبدأ من</span>
                                             <p className="text-2xl font-bold text-purple-600">
-                                                {service.base_price.toLocaleString()} <span className="text-lg">ريال</span>
+                                                {typeof service.base_price === 'number' ? (
+                                                    <>{service.base_price.toLocaleString()} <span className="text-lg">ريال</span></>
+                                                ) : (
+                                                    service.base_price
+                                                )}
                                             </p>
                                         </div>
                                         <button className="bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700 transition font-bold">

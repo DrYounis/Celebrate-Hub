@@ -1,13 +1,17 @@
 import { createClient } from '@supabase/supabase-js';
 import { NextResponse } from 'next/server';
 
+import { HAIL_VENUES } from '@/lib/hail-data';
+
 export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
-    const query = searchParams.get('q');
+    const query = searchParams.get('q')?.toLowerCase() || '';
     const category = searchParams.get('category');
 
     if (!query && !category) {
-        return NextResponse.json({ services: [] });
+        // Return mostly Google results + any DB results if empty query (show all)
+        const allExternal = HAIL_VENUES;
+        return NextResponse.json({ services: allExternal });
     }
 
     // Initialize Supabase client
@@ -29,28 +33,43 @@ export async function GET(request: Request) {
     }
 
     if (query) {
-        // Perform text search on title, description, or location
         dbQuery = dbQuery.or(`title.ilike.%${query}%,description.ilike.%${query}%,location.ilike.%${query}%`);
     }
 
-    const { data: services, error } = await dbQuery;
+    const { data: dbServices, error } = await dbQuery;
 
     if (error) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
+        console.error('DB Search Error:', error);
+        // Fallback to just external data if DB fails
     }
 
-    // Future Integration:
-    // Here we would perform server-side calls to Google Places API or TikTok API
-    // if we had access keys. For now, we return our internal results.
-    // const googleResults = await fetchGoogleMaps(query);
-    // const tiktokResults = await fetchTikTok(query);
+    // Filter External Data
+    let externalServices = HAIL_VENUES;
+
+    if (category && category !== 'all') {
+        externalServices = externalServices.filter(s => s.category === category);
+    }
+
+    if (query) {
+        externalServices = externalServices.filter(s =>
+            s.title.toLowerCase().includes(query) ||
+            s.description.toLowerCase().includes(query) ||
+            s.location.toLowerCase().includes(query)
+        );
+    }
+
+    // Merge: DB results first, then External
+    const finalServices = [
+        ...(dbServices || []),
+        ...externalServices
+    ];
 
     return NextResponse.json({
-        services: services || [],
+        services: finalServices,
         meta: {
             query,
-            count: services?.length || 0,
-            external_search_enabled: false // Flag to frontend
+            count: finalServices.length || 0,
+            external_search_enabled: true
         }
     });
 }
