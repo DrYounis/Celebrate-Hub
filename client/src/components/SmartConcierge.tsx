@@ -52,9 +52,9 @@ export const SmartConcierge: React.FC<SmartConciergeProps> = ({ isOpen, onClose 
             }
 
             nextStep(); // Go to success step (4)
-        } catch (err) {
+        } catch (err: any) {
             console.error('Error submitting request:', err);
-            alert('حدث خطأ بسيط، حاول مرة أخرى');
+            alert(`Error: ${err.message || 'حدث خطأ غير متوقع'}`);
         } finally {
             setLoading(false);
         }
