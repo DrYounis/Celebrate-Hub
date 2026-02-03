@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import Link from 'next/link';
 import { Search, MapPin, Users, Star, Filter } from 'lucide-react';
+import { Header } from '@/components/Header';
 
 interface Service {
     id: string;
@@ -47,20 +48,24 @@ export default function ServicesPage() {
     }, [selectedCategory, searchQuery, services]);
 
     const fetchServices = async () => {
-        const { data, error } = await supabase
-            .from('services')
-            .select(`
-        *,
-        profiles:provider_id (business_name)
-      `)
-            .eq('is_active', true)
-            .order('average_rating', { ascending: false });
+        try {
+            // Build query params
+            const params = new URLSearchParams();
+            if (searchQuery) params.append('q', searchQuery);
+            if (selectedCategory && selectedCategory !== 'all') params.append('category', selectedCategory);
 
-        if (data) {
-            setServices(data as any);
-            setFilteredServices(data as any);
+            const res = await fetch(`/api/search?${params.toString()}`);
+            const data = await res.json();
+
+            if (data.services) {
+                setServices(data.services);
+                setFilteredServices(data.services);
+            }
+        } catch (error) {
+            console.error('Error fetching services:', error);
+        } finally {
+            setLoading(false);
         }
-        setLoading(false);
     };
 
     const filterServices = () => {
@@ -83,7 +88,7 @@ export default function ServicesPage() {
 
     if (loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center">
+            <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-purple-50 to-white">
                 <div className="text-center">
                     <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-purple-600 mx-auto mb-4"></div>
                     <p className="text-gray-600">جاري تحميل الخدمات...</p>
@@ -94,30 +99,34 @@ export default function ServicesPage() {
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-purple-50 to-white" dir="rtl">
+            <Header />
+
             {/* Hero Section */}
-            <div className="bg-gradient-to-l from-purple-600 to-purple-800 text-white py-16 px-4">
+            <div className="bg-gradient-to-l from-purple-600 to-purple-800 text-white py-20 px-4">
                 <div className="max-w-7xl mx-auto">
-                    <h1 className="text-4xl md:text-5xl font-bold mb-4 text-center">
-                        اكتشف أفضل خدمات المناسبات
+                    <h1 className="text-4xl md:text-5xl font-bold mb-4 text-center animate-in slide-in-from-bottom-4 fade-in duration-700">
+                        اكتشف أفضل خدمات المناسبات 🏰
                     </h1>
-                    <p className="text-xl text-purple-100 text-center mb-8">
+                    <p className="text-xl text-purple-100 text-center mb-8 animate-in slide-in-from-bottom-8 fade-in duration-1000 delay-100">
                         احجز الآن واحصل على نقاط مكافآت فورية!
                     </p>
 
                     {/* Search Bar */}
-                    <div className="max-w-3xl mx-auto bg-white rounded-2xl p-2 shadow-2xl">
-                        <div className="flex items-center gap-2 flex-row-reverse"> {/* Ensure proper order in RTL */}
-                            <button className="bg-purple-600 text-white px-8 py-3 rounded-xl hover:bg-purple-700 transition font-bold whitespace-nowrap">
-                                بحث
-                            </button>
-                            <input
-                                type="text"
-                                placeholder="ابحث عن قاعة، مصور، أو أي خدمة..."
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                className="flex-1 p-3 text-gray-900 outline-none text-lg text-right"
-                            />
-                            <Search className="text-gray-400 ml-3" size={24} />
+                    <div className="max-w-3xl mx-auto animate-in zoom-in duration-500 delay-200">
+                        <div className="bg-white rounded-2xl p-2 shadow-2xl mb-6 ring-4 ring-white/20 backdrop-blur-sm">
+                            <div className="flex items-center gap-3">
+                                <Search className="text-gray-400 mr-3" size={24} />
+                                <input
+                                    type="text"
+                                    placeholder="ابحث عن قاعة، مصور، أو أي خدمة..."
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    className="flex-1 p-3 text-gray-900 outline-none text-lg"
+                                />
+                                <button className="bg-purple-600 text-white px-8 py-3 rounded-xl hover:bg-purple-700 transition font-bold whitespace-nowrap">
+                                    بحث
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -168,11 +177,12 @@ export default function ServicesPage() {
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {filteredServices.map((service) => (
+                        {filteredServices.map((service, index) => (
                             <Link
                                 key={service.id}
                                 href={`/services/${service.id}`}
-                                className="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100"
+                                className="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 border border-gray-100 animate-in fade-in slide-in-from-bottom-8 fill-mode-backwards"
+                                style={{ animationDelay: `${index * 100}ms` }}
                             >
                                 {/* Image Placeholder */}
                                 <div className="h-56 bg-gradient-to-br from-purple-400 to-pink-400 relative overflow-hidden">

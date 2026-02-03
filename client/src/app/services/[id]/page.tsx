@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import { useRouter } from 'next/navigation';
 import { MapPin, Users, Star, Calendar, Clock, ArrowRight } from 'lucide-react';
+import WhatsAppButton from '@/components/WhatsAppButton';
 
 interface Service {
     id: string;
@@ -20,6 +21,8 @@ interface Service {
     profiles: {
         business_name: string;
         full_name: string;
+        phone: string | null;
+        whatsapp_enabled: boolean;
     };
 }
 
@@ -56,7 +59,7 @@ export default function ServiceDetailPage({ params }: { params: { id: string } }
             .from('services')
             .select(`
         *,
-        profiles:provider_id (business_name, full_name)
+        profiles:provider_id (business_name, full_name, phone, whatsapp_enabled)
       `)
             .eq('id', params.id)
             .single();
@@ -212,8 +215,8 @@ export default function ServiceDetailPage({ params }: { params: { id: string } }
                                             key={pkg.id}
                                             onClick={() => setSelectedPackage(pkg)}
                                             className={`p-6 rounded-xl border-2 cursor-pointer transition ${selectedPackage?.id === pkg.id
-                                                    ? 'border-purple-600 bg-purple-50'
-                                                    : 'border-gray-200 hover:border-purple-300'
+                                                ? 'border-purple-600 bg-purple-50'
+                                                : 'border-gray-200 hover:border-purple-300'
                                                 }`}
                                         >
                                             <div className="flex justify-between items-start mb-4">

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import './globals.css'
+import FloatingWhatsApp from '@/components/FloatingWhatsApp'
 
 export const metadata: Metadata = {
   title: 'Celebrate Hub | منصة تنظيم المناسبات',
@@ -21,7 +22,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ar" dir="rtl">
-      <body>{children}</body>
+      <body>
+        {children}
+        <FloatingWhatsApp
+          phone="0555056545"
+          message="مرحباً! أحتاج إلى مساعدة في Celebrate Hub"
+        />
+      </body>
     </html>
   )
 }

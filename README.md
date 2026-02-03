@@ -46,6 +46,161 @@
 
 ---
 
+## 📁 هيكل المشروع (Project Structure)
+
+```
+Event_Managment/
+├── client/                      # Next.js Frontend Application
+│   ├── public/                  # Static assets
+│   ├── src/
+│   │   ├── app/                 # Next.js App Router pages
+│   │   │   ├── dashboard/       # User dashboards
+│   │   │   │   ├── page.tsx     # Main dashboard
+│   │   │   │   └── services/    # Service management
+│   │   │   ├── services/        # Service marketplace
+│   │   │   │   ├── page.tsx     # Services listing
+│   │   │   │   └── [id]/        # Service details
+│   │   │   ├── globals.css      # Global styles
+│   │   │   └── layout.tsx       # Root layout
+│   │   ├── components/          # Reusable React components
+│   │   │   ├── Header.tsx       # Navigation header
+│   │   │   ├── AuthModal.tsx    # Authentication modal
+│   │   │   ├── AuthPortal.tsx   # Login/signup form
+│   │   │   └── SmartConcierge.tsx # Event planning wizard
+│   │   └── lib/
+│   │       └── supabaseClient.ts # Supabase configuration
+│   ├── package.json
+│   ├── next.config.ts
+│   ├── tailwind.config.ts
+│   └── vercel.json              # Vercel deployment config
+│
+├── supabase/                    # Database & Backend
+│   ├── migrations/              # Database migrations
+│   │   ├── 20260203_payment_system.sql
+│   │   └── ...
+│   ├── master_schema.sql        # Complete database schema
+│   ├── seed_data.sql            # Sample data
+│   └── tests/                   # Database tests
+│
+└── README.md                    # Project documentation
+```
+
+---
+
+## 🗄️ قاعدة البيانات (Database Schema)
+
+### الجداول الأساسية (Core Tables)
+
+#### 1. **profiles** - ملفات المستخدمين
+```sql
+- id (uuid, PK) → auth.users
+- full_name, avatar_url
+- role: 'free' | 'pro'
+- business_name, category (للمزودين)
+- is_verified, total_points
+```
+
+#### 2. **services** - كتالوج الخدمات
+```sql
+- id (uuid, PK)
+- provider_id → profiles
+- title, description, category
+- base_price, currency (SAR)
+- images (jsonb), features (jsonb)
+- location, capacity
+- average_rating, total_reviews
+```
+
+#### 3. **service_packages** - باقات التسعير
+```sql
+- id (uuid, PK)
+- service_id → services
+- name, price, features (jsonb)
+- max_guests, duration_hours
+```
+
+#### 4. **bookings** - الحجوزات
+```sql
+- id (uuid, PK)
+- service_id → services
+- package_id → service_packages
+- customer_id, provider_id → profiles
+- event_date, event_time, guest_count
+- total_amount
+- payment_status: 'pending' | 'paid' | 'refunded'
+- booking_status: 'pending' | 'confirmed' | 'cancelled' | 'completed'
+- payment_required, requires_deposit, deposit_percentage
+```
+
+#### 5. **transactions** - المعاملات المالية
+```sql
+- id (uuid, PK)
+- booking_id → bookings (unique)
+- stripe_payment_intent_id, stripe_charge_id
+- amount_total, platform_fee_amount (12%), vendor_payout_amount
+- status: 'pending' | 'held' | 'released' | 'refunded' | 'disputed'
+- held_until, released_at (escrow system)
+- payment_method_type, client_ip
+```
+
+#### 6. **stripe_accounts** - حسابات Stripe للمزودين
+```sql
+- id (uuid, PK)
+- user_id → profiles (unique)
+- stripe_account_id (unique)
+- onboarding_completed, payouts_enabled
+- country (SA), currency (SAR)
+```
+
+#### 7. **service_reviews** - تقييمات الخدمات
+```sql
+- id (uuid, PK)
+- service_id → services
+- booking_id → bookings (unique)
+- customer_id → profiles
+- rating (1-5), comment
+```
+
+#### 8. **gamification_logs** - سجل النقاط
+```sql
+- id (uuid, PK)
+- user_id → profiles
+- action_type, points_earned
+- metadata (jsonb)
+```
+
+#### 9. **availability** - جداول التوفر
+```sql
+- id (uuid, PK)
+- service_id → services
+- date, is_available
+- time_slots (jsonb)
+```
+
+#### 10. **promotional_codes** - أكواد الخصم
+```sql
+- id (uuid, PK)
+- code (unique), discount_type, discount_value
+- valid_from, valid_until
+- max_uses, current_uses
+```
+
+### الدوال والمحفزات (Functions & Triggers)
+
+- `calculate_platform_fee(amount)` → Returns 12% commission
+- `auto_release_escrow()` → Releases held payments after 7 days
+- `award_points(user_id, points, action)` → Awards gamification points
+- `update_service_rating()` → Updates average rating on new review
+- `award_booking_points()` → Awards 100 XP on booking completion
+- `handle_new_user()` → Auto-creates profile on signup
+
+### العروض التحليلية (Analytics Views)
+
+- `vendor_earnings` → Pending/available balance per vendor
+- `platform_revenue` → Monthly GMV, commission, net revenue
+
+---
+
 ## 🚀 طريقة التشغيل (Setup Guide)
 
 ### المتطلبات
