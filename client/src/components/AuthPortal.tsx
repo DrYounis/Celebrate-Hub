@@ -23,14 +23,7 @@ export const AuthPortal: React.FC<AuthPortalProps> = ({ onSuccess }) => {
     // New roles added
     const [role, setRole] = useState<'free' | 'pro' | 'investor' | 'entrepreneur'>('free');
 
-    useEffect(() => {
-        // Auto-select role based on URL param (e.g. from Academy page)
-        const typeParam = searchParams.get('type');
-        if (typeParam === 'entrepreneur') {
-            setRole('entrepreneur');
-            setIsLogin(false); // Switch to registration mode
-        }
-    }, [searchParams]);
+
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
