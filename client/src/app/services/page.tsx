@@ -5,6 +5,7 @@ import { supabase } from '@/lib/supabaseClient';
 import Link from 'next/link';
 import { Search, MapPin, Users, Star, Filter } from 'lucide-react';
 import { Header } from '@/components/Header';
+// Force rebuild
 
 interface Service {
     id: string;
